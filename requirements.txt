@@ -1,2 +1,1 @@
-pew==1.1.1
-git+https://github.com/Rapptz/discord.py#egg=discord.py[voice]git+https://github.com/Rapptz/discord.py#egg=discord.py
+git+https://github.com/Rapptz/discord.py#egg=discord.py
