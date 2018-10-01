@@ -1,1 +1,1 @@
-git+https://github.com/Rapptz/discord.py#egg=discord.py[voice]
+git+https://github.com/Rapptz/discord.py@async#egg=discord.py[voice]
