@@ -1,0 +1,8 @@
+{
+“name”: “mmbot”,
+“version”: “1.0.0”,
+“description”: “Bot to Mass Move Players”,
+“main”: “bot.js”,
+“author”: “Eden.exe”,
+“dependencies”: {}
+}
