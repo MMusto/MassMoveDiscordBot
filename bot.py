@@ -52,6 +52,7 @@ async def mcc(ctx, chname1 : str, chname2 : str):
 async def help():
 	await client.say('.mah - "Move-All-Here : Moves all players to your current voice channel')
 	await client.say('.mcc - "Move-Channel-To-Channel" : .mcc (CHANNEL 1) (CHANNEL 2)  Moves all players from first channel to second channel')
+	
 @client.command
 async def test():
 	await client.say('.mah - "Move-All-Here : Moves all players to your current voice channel')
