@@ -2,8 +2,9 @@ import discord
 from discord.ext import commands
 import discord.utils
 import time
+import os
 
-TOKEN = 'NDk2MDM5MTg4ODE5NjA3NTYy.DpK05Q.hFReS4q5d0kLHOCh5yCQUbHFbGc'
+TOKEN = os.environ["TOKEN"]
 
 client = commands.Bot(command_prefix = '.')
 
