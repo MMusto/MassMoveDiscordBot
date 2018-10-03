@@ -27,23 +27,23 @@ async def mah(ctx):
 		await client.say("Sorry you don't have permissions for that.")
 		
 def get_channel(chname : str) -> "Channel":
-'''Helper function that returns Channel object from name snippet'''
-	for channel in client.get_all_channels():
-		if(str(channel.type) == 'voice'):
-			if(chname.lower() in channel.name.lower()):
-				return channel
-	return None
+        '''Helper function that returns Channel object from name snippet'''
+        for channel in client.get_all_channels():
+                if(str(channel.type) == 'voice'):
+                        if(chname.lower() in channel.name.lower()):
+                                return channel
+        return None
 		
 @client.command(pass_context=True)
 async def mcc(ctx, chname1 : str, chname2 : str):
 	'''"Move-Channel-to-Channel" : .mcc (CHANNEL 1) (CHANNEL 2) -  Moves everyone from Channel 1 to Channel 2'''
 	ch1 = get_channel(chname1)
 	ch2 = get_channel(chname2)
-	if ch1 == None and ch2 != None:
+	if(ch1 == None and ch2 != None):
 		await client.say("Sorry, '" + chname1 + "' could not be found.")
-	elif ch2 == None and ch1 != None:
+	elif(ch2 == None and ch1 != None):
 		await client.say("Sorry, '" + chname2 + "' could not be found.")
-	elif ch2 == None and ch1 = None:
+	elif(ch2 == None and ch1 == None):
 		await client.say("Sorry, both '" + chname1 + "' and  '" + chname2 + "' could not be found.")
 	else:
 		lst = []
