@@ -1,7 +1,5 @@
 import discord
 from discord.ext import commands
-import discord.utils
-import time
 import os
 
 TOKEN = os.environ["TOKEN"]
