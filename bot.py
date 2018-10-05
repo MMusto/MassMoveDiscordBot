@@ -8,10 +8,10 @@ client = commands.Bot(command_prefix = '.')
 
 @client.event
 async def on_ready():
-	print("bot is ready")
+	print("**********THE BOT IS READY**********")
 	
 @client.command(pass_context=True)
-async def mah(ctx):
+async def mah(ctx) -> None:
 	'''"Move-All-Here" : Moves everyone to your current voice channel '''
 	author = ctx.message.author
 	if author.server_permissions.move_members:
@@ -22,7 +22,7 @@ async def mah(ctx):
 		for member in client.get_all_members():
 			if(member.voice_channel != None and not member.is_afk and member != author):
 				await client.move_member(member, move_channel)
-				await client.say("Moved " + str(member) + " to " + str(move_channel))
+				await client.say("Mass moved everyone to " + str(move_channel))
 	else:
 		await client.say("Sorry you don't have permissions for that.")
 		
@@ -35,7 +35,7 @@ def get_channel(chname : str) -> "Channel":
         return None
 		
 @client.command(pass_context=True)
-async def mcc(ctx, chname1 : str, chname2 : str):
+async def mcc(ctx, chname1 : str, chname2 : str) -> None:
 	'''"Move-Channel-to-Channel" : .mcc (CHANNEL 1) (CHANNEL 2) -  Moves everyone from Channel 1 to Channel 2'''
 	ch1 = get_channel(chname1)
 	ch2 = get_channel(chname2)
@@ -46,15 +46,8 @@ async def mcc(ctx, chname1 : str, chname2 : str):
 	elif(ch2 == None and ch1 == None):
 		await client.say("Sorry, both '" + chname1 + "' and  '" + chname2 + "' could not be found.")
 	else:
-		lst = []
-		for member in get_channel(chname1).voice_members:
-			lst.append(member)
+		lst = [member for member in ch1.voice_members]
 		for member in lst:
 			await client.move_member(member, ch2)
-@client.command
-async def commands():
-	await client.say('.mah - "Move-All-Here : Moves all players to your current voice channel')
-	await client.say('.mcc - "Move-Channel-To-Channel" : .mcc (CHANNEL 1) (CHANNEL 2)  Moves all players from first channel to second channel')
-
 
 client.run(TOKEN)
