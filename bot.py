@@ -25,7 +25,7 @@ async def mah(ctx) -> None:
 			if(member.voice_channel != None and not member.is_afk and member != author):
 				await client.move_member(member, move_channel)
 				await client.say("Mass moved everyone to " + str(move_channel))
-		client.delete_message(ctx.message)
+		await client.delete_message(ctx.message)
 	else:
 		await client.say("Sorry you don't have permissions for that.")
 		
@@ -52,10 +52,10 @@ async def mcc(ctx, chname1 : str, chname2 : str) -> None:
 		lst = [member for member in ch1.voice_members]
 		for member in lst:
 			await client.move_member(member, ch2)
-		client.delete_message(ctx.message)
+		await client.delete_message(ctx.message)
 		
 @client.command(pass_context=True)
-asycn def clear(ctx) -> None:
+async def clear(ctx) -> None:
 	'''Clears all error messages from this bot'''
 	pass
 	
