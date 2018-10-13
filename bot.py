@@ -59,5 +59,23 @@ async def clear(ctx) -> None:
 	'''Clears all error messages from this bot'''
 	pass
 	
+@client.command(pass_context=True)
+async def rdelete(ctx) -> None:
+	'''Use reactions to mass delete messages'''
+	#:regional_indicator_t:
+	author = ctx.message.author
+	if (not author.server_permissions.manage_messages):
+		await client.say("Sorry, you don't have permissions for that!")
+		return None
+	msg = ctx.message
+	channel = ctx.message.channel
+	
+	logs = client.logs_from(channel, limit=5)
+	async for message in logs:
+		await client.say(message)
+	
+	
+	
+	
 
 client.run(TOKEN)
