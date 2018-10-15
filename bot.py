@@ -61,7 +61,10 @@ async def clear(ctx,lim=1) -> None:
 	async for message in client.logs_from(ctx.message.channel,limit=int(lim)):
 		dlist.append(message)
 	await client.delete_messages(dlist)
-	
+
+@client.command()
+async def ping():
+	await client.say("Pong!")
 # @client.command(pass_context=True)
 # async def rdelete(ctx):
 	# '''Use reactions to mass delete messages'''
