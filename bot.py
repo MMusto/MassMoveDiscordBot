@@ -6,6 +6,7 @@ TOKEN = os.environ["TOKEN"]
 
 client = commands.Bot(command_prefix = '.')
 
+
 @client.event
 async def on_ready():
 	print("**********THE BOT IS READY**********")
@@ -55,27 +56,56 @@ async def mcc(ctx, chname1 : str, chname2 : str) -> None:
 		await client.delete_message(ctx.message)
 		
 @client.command(pass_context=True)
-async def clear(ctx) -> None:
+async def clear(ctx,lim=1) -> None:
 	'''Clears all error messages from this bot'''
-	pass
+	async for message in client.logs_from(ctx.message.channel,limit=int(lim)):
+		await client.delete_message(message)
 	
-@client.command(pass_context=True)
-async def rdelete(ctx) -> None:
-	'''Use reactions to mass delete messages'''
-	#:regional_indicator_t:
-	author = ctx.message.author
-	if (not author.server_permissions.manage_messages):
-		await client.say("Sorry, you don't have permissions for that!")
-		return None
-	msg = ctx.message
-	channel = ctx.message.channel
-	
-	logs = client.logs_from(channel, limit=5)
-	async for message in logs:
-		await client.say(message)
-	
-	
-	
+# @client.command(pass_context=True)
+# async def rdelete(ctx):
+	# '''Use reactions to mass delete messages'''
+	# #:regional_indicator_t:
+	# msg = ctx.message
+	# author = msg.author
+	# if (author.server_permissions.manage_messages):
+		# pass
+		
+		# # await client.send_message(channel, react)
+		# # logs = []
+		# # async for message in client.logs_from(channel, limit = 50, before=msg):
+			# # logs.append(message)		
+	# else:
+		# await client.say("Sorry, you don't have permissions for that!")	
+		
+@client.event
+async def on_reaction_add(reaction, user):
+	if(user.server_permissions.manage_messages):
+		channel = reaction.message.channel
+		msg1 = reaction.message
+		if(reaction.emoji == '🆑'):
+			#await client.send_message(channel, user.name + " Set Marker at message '" + msg1.content + "' Please select second marker using " + '🔴')
+			res = await client.wait_for_reaction(emoji = '🔴')
+			msg2 = res.reaction.message
+			count = 1
+			if(msg1.timestamp < msg2.timestamp):
+				first = msg2
+				second = msg1
+			else:
+				first = msg1
+				second = msg2
+			dlist = [first]
+			async for message in client.logs_from(channel, before=first):#after vs bfore switch
+				#await client.delete_message(message)
+				dlist.append(message)
+				#print("Delete # " + str(count) + ": " + message.content)
+				if(message.timestamp == second.timestamp):
+					#print("AT MSG 2: " + message.content)
+					break
+				count += 1
+			#await client.delete_message(first)
+			await client.delete_messages(dlist)
+			
+			
 	
 
 client.run(TOKEN)
