@@ -6,7 +6,6 @@ TOKEN = os.environ["TOKEN"]
 
 client = commands.Bot(command_prefix = '.')
 
-
 @client.event
 async def on_ready():
 	print("**********THE BOT IS READY**********")
@@ -58,8 +57,10 @@ async def mcc(ctx, chname1 : str, chname2 : str) -> None:
 @client.command(pass_context=True)
 async def clear(ctx,lim=1) -> None:
 	'''Clears all error messages from this bot'''
+	dlist = []
 	async for message in client.logs_from(ctx.message.channel,limit=int(lim)):
-		await client.delete_message(message)
+		dlist.append(message)
+	await client.delete_messages(dlist)
 	
 # @client.command(pass_context=True)
 # async def rdelete(ctx):
@@ -104,8 +105,5 @@ async def on_reaction_add(reaction, user):
 				count += 1
 			#await client.delete_message(first)
 			await client.delete_messages(dlist)
-			
-			
-	
 
 client.run(TOKEN)
