@@ -3,7 +3,6 @@ from discord.ext import commands
 import os
 
 TOKEN = os.environ["TOKEN"]
-
 client = commands.Bot(command_prefix = '.')
 
 @client.event
@@ -52,8 +51,32 @@ async def mcc(ctx, chname1 : str, chname2 : str) -> None:
 		lst = [member for member in ch1.voice_members]
 		for member in lst:
 			await client.move_member(member, ch2)
-		await client.delete_message(ctx.message)
 		
+@client.command(pass_context=True)
+async def mbr(ctx, role : str, chname : str) -> None:
+	'''"Move-By-Role" : .mbr (ROLE_NAME) (CHANNEL x) -  Moves everyone from with Role ROLE_NAME to Channel x'''
+	ch = get_channel(chname)
+	got_role = get_role(ctx.message.author.server, role)
+			
+	if(ch == None and got_role == None):
+		await client.say("Sorry, both '" + chname + "' and '" + role + "' could not be found.")
+	elif(ch == None):
+		await client.say("Sorry, '" + chname + "' could not be found.")
+	elif(got_role == None):
+		await client.say("Sorry, '" + role + "' could not be found.")
+	for member in client.get_all_members():
+		if(member.voice_channel != None and member.voice_channel != ch and not member.is_afk):
+			for rolee in member.roles:
+				if rolee == got_role:
+					await client.move_member(member, ch)
+					await client.say("Moved Member: " + member.name + " with role " + got_role.name + " to channel " + chname)
+					
+def get_role(server, role : str) -> 'Role':
+	'''Helper function that returns Role object from name snippet'''
+	for roleo in server.roles:
+		if role in roleo.name:
+			return roleo
+	return None
 @client.command(pass_context=True)
 async def clear(ctx,lim=1) -> None:
 	'''Clears all error messages from this bot'''
