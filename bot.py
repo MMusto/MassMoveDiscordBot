@@ -74,7 +74,7 @@ async def mbr(ctx, role : str, chname : str) -> None:
 def get_role(server, role : str) -> 'Role':
 	'''Helper function that returns Role object from name snippet'''
 	for roleo in server.roles:
-		if role in roleo.name:
+		if role.lower() in roleo.name.lower():
 			return roleo
 	return None
 @client.command(pass_context=True)
