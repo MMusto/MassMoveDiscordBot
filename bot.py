@@ -3,6 +3,10 @@ from discord.ext import commands
 import os
 import youtube_dl
 from discord import opus
+
+TOKEN = os.environ["TOKEN"]
+client = commands.Bot(command_prefix = '.')
+
 OPUS_LIBS = ['libopus-0.x86.dll', 'libopus-0.x64.dll',
              'libopus-0.dll', 'libopus.so.0', 'libopus.0.dylib']
 
@@ -27,9 +31,6 @@ opts = {
 
 load_opus_lib()
 players = {}
-
-TOKEN = os.environ["TOKEN"]
-client = commands.Bot(command_prefix = '.')
 
 @client.event
 async def on_ready():
@@ -355,12 +356,13 @@ async def resume(con):
 
 @client.command(pass_context=True)
 async def lib(ctx, url):
+	url = 'sound\\' + url
 	channel = ctx.message.author.voice.voice_channel
 	server= ctx.message.server
 	if client.voice_client_in(server) == None:
 		await client.join_voice_channel(channel)
 	voice_client = client.voice_client_in(server)
-	player = voice_client.create_ffmpeg_player(filename = 'sound\' + url)
+	player = voice_client.create_ffmpeg_player(filename = url)
 	player.start()
 	
 client.run(TOKEN)
