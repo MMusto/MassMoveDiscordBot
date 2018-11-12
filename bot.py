@@ -33,6 +33,8 @@ client = commands.Bot(command_prefix = '.')
 
 @client.event
 async def on_ready():
+	client.loop.create_task(bg())
+	print(client.user.name)
 	print("**********THE BOT IS READY**********")
 	
 @client.command(pass_context=True)
@@ -158,32 +160,207 @@ async def on_reaction_add(reaction, user):
 			#await client.delete_message(first)
 			await client.delete_messages(dlist)
 
-@client.command(pass_context=True)			
-async def join(ctx):
-	channel = ctx.message.author.voice.voice_channel
-	await client.join_voice_channel(channel)
+# @client.command(pass_context=True)			
+# async def join(ctx):
+	# channel = ctx.message.author.voice.voice_channel
+	# await client.join_voice_channel(channel)
 	
-@client.command(pass_context=True)			
-async def leave(ctx):
-	server = ctx.message.server
-	voice_client = client.voice_client_in(server)
-	await voice_client.disconnect()
+# @client.command(pass_context=True)			
+# async def leave(ctx):
+	# server = ctx.message.server
+	# voice_client = client.voice_client_in(server)
+	# await voice_client.disconnect()
 	
-@client.command(pass_context=True)	
-async def play(ctx, url):
+# @client.command(pass_context=True)	
+# async def play(ctx, url):
+	# channel = ctx.message.author.voice.voice_channel
+	# server= ctx.message.server
+	# if client.voice_client_in(server) == None:
+		# await client.join_voice_channel(channel)
+	# voice_client = client.voice_client_in(server)
+	# player = await voice_client.create_ytdl_player(url)
+	# players[server.id] = player
+	# player.start()
+	
+# @client.command(pass_context=True)	
+# async def pause(ctx):
+	# server = ctx.message.server
+	# player = players[server.id]
+	# player.pause()
+servers_songs={}
+player_status={}
+now_playing={}
+song_names={}
+paused={}
+
+async def set_player_status():
+    for i in client.servers:
+        player_status[i.id]=False
+        servers_songs[i.id]=None
+        paused[i.id]=False
+        song_names[i.id]=[]
+    print(200)
+
+async def check_voice(con):
+    pass
+
+async def bg():
+    client.loop.create_task(set_player_status())
+	
+async def queue_songs(con,clear):
+    if clear == True:
+        song_names[con.message.server.id].clear()
+        await client.voice_client_in(con.message.server).disconnect()
+        player_status[con.message.server.id] = False
+
+    if clear == False:
+
+        if len(song_names[con.message.server.id])==0:
+            servers_songs[con.message.server.id]=None
+
+        if len(song_names[con.message.server.id]) !=0:
+            song=await client.voice_client_in(con.message.server).create_ytdl_player(song_names[con.message.server.id][0], ytdl_options=opts, after=lambda: client.loop.create_task(after_song(con, False)))
+            servers_songs[con.message.server.id]=song
+            servers_songs[con.message.server.id].start()
+            await client.delete_message(now_playing[con.message.server.id])
+            msg=await client.send_message(con.message.channel,"Now playing {}".format(servers_songs[con.message.server.id].title))
+            now_playing[con.message.server.id]=msg
+
+            if len(song_names[con.message.server.id]) >= 1:
+                song_names[con.message.server.id].pop(0)
+
+
+        if len(song_names[con.message.server.id]) ==0 and servers_songs[con.message.server.id] == None:
+            player_status[con.message.server.id]=False
+        
+
+async def after_song(con,clear):
+    client.loop.create_task(queue_songs(con,clear))
+    client.loop.create_task(check_voice(con))
+
+
+
+@client.command(pass_context=True)
+async def play(con,*,url):
+    """PLAY THE GIVEN SONG AND QUEUE IT IF THERE IS CURRENTLY SOGN PLAYING"""
+    check = str(con.message.channel)
+    if check == 'Direct Message with {}'.format(con.message.author.name):
+        await client.send_message(con.message.channel, "**You must be in a `server voice channel` to use this command**")
+
+    if check != 'Direct Message with {}'.format(con.message.author.name):
+        if client.is_voice_connected(con.message.server) == False:
+            await client.join_voice_channel(con.message.author.voice.voice_channel)
+
+        if client.is_voice_connected(con.message.server) == True:
+            if player_status[con.message.server.id]==True:
+                song_names[con.message.server.id].append(url)
+                await client.send_message(con.message.channel, "**Song  Queued**")
+
+
+                
+            if player_status[con.message.server.id]==False:
+                player_status[con.message.server.id]=True
+                song_names[con.message.server.id].append(url)
+                song=await client.voice_client_in(con.message.server).create_ytdl_player(song_names[con.message.server.id][0], ytdl_options=opts, after=lambda: client.loop.create_task(after_song(con,False)))
+                servers_songs[con.message.server.id]=song
+                servers_songs[con.message.server.id].start()
+                msg = await client.send_message(con.message.channel, "Now playing {}".format(servers_songs[con.message.server.id].title))
+                now_playing[con.message.server.id]=msg
+                song_names[con.message.server.id].pop(0)
+
+
+
+
+@client.command(pass_context=True)
+async def skip(con):
+    check = str(con.message.channel)
+    if check == 'Direct Message with {}'.format(con.message.author.name):#COMMAND IS IN DM
+        await client.send_message(con.message.channel, "**You must be in a `server voice channel` to use this command**")
+
+    if check != 'Direct Message with {}'.format(con.message.author.name):#COMMAND NOT IN DM
+        if servers_songs[con.message.server.id]== None or len(song_names[con.message.server.id])==0 or player_status[con.message.server.id]==False:
+            await client.send_message(con.message.channel,"**No songs in queue to skip**")
+        if servers_songs[con.message.server.id] !=None:
+            servers_songs[con.message.server.id].pause()
+            client.loop.create_task(queue_songs(con,False))
+
+
+
+@client.command(pass_context=True)
+async def join(con,channel=None):
+    """JOIN A VOICE CHANNEL THAT THE USR IS IN OR MOVE TO A VOICE CHANNEL IF THE BOT IS ALREADY IN A VOICE CHANNEL"""
+    check = str(con.message.channel)
+
+    if check == 'Direct Message with {}'.format(con.message.author.name):#COMMAND IS IN DM
+        await client.send_message(con.message.channel, "**You must be in a `server voice channel` to use this command**")
+
+    if check != 'Direct Message with {}'.format(con.message.author.name):#COMMAND NOT IN DM
+        voice_status = client.is_voice_connected(con.message.server)
+
+        if voice_status == False:#VOICE NOT CONNECTED
+            await client.join_voice_channel(con.message.author.voice.voice_channel)
+
+        if voice_status == True:#VOICE ALREADY CONNECTED
+            await client.send_message(con.message.channel, "**Bot is already connected to a voice channel**")
+
+
+
+@client.command(pass_context=True)
+async def leave(con):
+    """LEAVE THE VOICE CHANNEL AND STOP ALL SONGS AND CLEAR QUEUE"""
+    check=str(con.message.channel)
+    if check == 'Direct Message with {}'.format(con.message.author.name):#COMMAND USED IN DM
+        await client.send_message(con.message.channel,"**You must be in a `server voice channel` to use this command**")
+
+    if check != 'Direct Message with {}'.format(con.message.author.name):#COMMAND NOT IN DM
+        
+        # IF VOICE IS NOT CONNECTED
+        if client.is_voice_connected(con.message.server) == False:
+            await client.send_message(con.message.channel,"**Bot is not connected to a voice channel**")
+
+        # VOICE ALREADY CONNECTED
+        if client.is_voice_connected(con.message.server) == True:
+            client.loop.create_task(queue_songs(con,True))
+
+@client.command(pass_context=True)
+async def pause(con):
+    check = str(con.message.channel)
+    if check == 'Direct Message with {}'.format(con.message.author.name):# COMMAND IS IN DM
+        await client.send_message(con.message.channel, "**You must be in a `server voice channel` to use this command**")
+
+    # COMMAND NOT IN DM
+    if check != 'Direct Message with {}'.format(con.message.author.name):
+        if servers_songs[con.message.server.id]!=None:
+            if paused[con.message.server.id] == True:
+                await client.send_message(con.message.channel,"**Audio already paused**")
+            if paused[con.message.server.id]==False:
+                servers_songs[con.message.server.id].pause()
+                paused[con.message.server.id]=True
+
+@client.command(pass_context=True)
+async def resume(con):
+    check = str(con.message.channel)
+    # COMMAND IS IN DM
+    if check == 'Direct Message with {}'.format(con.message.author.name):
+        await client.send_message(con.message.channel, "**You must be in a `server voice channel` to use this command**")
+
+    # COMMAND NOT IN DM
+    if check != 'Direct Message with {}'.format(con.message.author.name):
+        if servers_songs[con.message.server.id] != None:
+            if paused[con.message.server.id] == False:
+                await client.send_message(con.message.channel,"**Audio already playing**")
+            if paused[con.message.server.id] ==True:
+                servers_songs[con.message.server.id].resume()
+                paused[con.message.server.id]=False
+
+@client.command(pass_context=True)
+async def lib(ctx, url):
 	channel = ctx.message.author.voice.voice_channel
 	server= ctx.message.server
 	if client.voice_client_in(server) == None:
 		await client.join_voice_channel(channel)
 	voice_client = client.voice_client_in(server)
-	player = await voice_client.create_ytdl_player(url)
-	players[server.id] = player
+	player = voice_client.create_ffmpeg_player(filename = url)
 	player.start()
 	
-@client.command(pass_context=True)	
-async def pause(ctx):
-	server = ctx.message.server
-	player = players[server.id]
-	player.pause()
-			
 client.run(TOKEN)
