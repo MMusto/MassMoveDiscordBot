@@ -108,7 +108,7 @@ async def mbr(ctx, role : str, chname : str) -> None:
 				for rolee in member.roles:
 					if rolee == got_role:
 						await client.move_member(member, ch)
-						await client.say("Moved Member: " + member.name + " with role " + got_role.name + " to channel " + ch.name)
+						#await client.say("Moved Member: " + member.name + " with role " + got_role.name + " to channel " + ch.name)
 		await client.delete_message(ctx.message)
 	else:
 		await client.say("Sorry you don't have permissions for that.")
@@ -360,7 +360,7 @@ async def lib(ctx, url):
 	if client.voice_client_in(server) == None:
 		await client.join_voice_channel(channel)
 	voice_client = client.voice_client_in(server)
-	player = voice_client.create_ffmpeg_player(filename = url)
+	player = voice_client.create_ffmpeg_player(filename = 'sound\' + url)
 	player.start()
 	
 client.run(TOKEN)
