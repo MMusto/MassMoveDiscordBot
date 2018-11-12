@@ -1,2 +1,4 @@
 git+https://github.com/Rapptz/discord.py#egg=discord.py
 git+https://github.com/rg3/youtube-dl#egg=youtube_dl
+asyncio
+PyNaCl
