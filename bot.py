@@ -356,7 +356,7 @@ async def resume(con):
 
 @client.command(pass_context=True)
 async def lib(ctx, url):
-	url = 'sound\\' + url
+	#url = 'sound\\' + url
 	channel = ctx.message.author.voice.voice_channel
 	server= ctx.message.server
 	if client.voice_client_in(server) == None:
