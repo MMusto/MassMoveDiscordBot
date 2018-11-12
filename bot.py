@@ -1,6 +1,9 @@
 import discord
 from discord.ext import commands
 import os
+import youtube_dl
+
+players = {}
 
 TOKEN = os.environ["TOKEN"]
 client = commands.Bot(command_prefix = '.')
@@ -43,7 +46,7 @@ def get_channel(server, chname : str) -> "Channel":
 async def mcc(ctx, chname1 : str, chname2 : str) -> None:
 	'''"Move-Channel-to-Channel" : .mcc (CHANNEL 1) (CHANNEL 2) -  Moves everyone from Channel 1 to Channel 2'''
 	if ctx.message.author.server_permissions.move_members:
-		server = ctx.message.author.server
+		server = ctx.message.server
 		ch1 = get_channel(server, chname1)
 		ch2 = get_channel(server, chname2)
 		if(ch1 == None and ch2 != None):
@@ -64,7 +67,7 @@ async def mcc(ctx, chname1 : str, chname2 : str) -> None:
 async def mbr(ctx, role : str, chname : str) -> None:
 	'''"Move-By-Role" : .mbr (ROLE_NAME) (CHANNEL x) -  Moves everyone from with Role ROLE_NAME to Channel x'''
 	if ctx.message.author.server_permissions.move_members:
-		server = ctx.message.author.server
+		server = ctx.message.server
 		ch = get_channel(server, chname)
 		got_role = get_role(server, role)
 		all_members = server.members
@@ -132,4 +135,32 @@ async def on_reaction_add(reaction, user):
 			#await client.delete_message(first)
 			await client.delete_messages(dlist)
 
+@client.command(pass_context=True)			
+async def join(ctx):
+	channel = ctx.message.author.voice.voice_channel
+	await client.join_voice_channel(channel)
+	
+@client.command(pass_context=True)			
+async def leave(ctx):
+	server = ctx.message.server
+	voice_client = client.voice_client_in(server)
+	await voice_client.disconnect()
+	
+@client.command(pass_context=True)	
+async def play(ctx, url):
+	channel = ctx.message.author.voice.voice_channel
+	server= ctx.message.server
+	if client.voice_client_in(server) == None:
+		await client.join_voice_channel(channel)
+	voice_client = client.voice_client_in(server)
+	player = await voice_client.create_ytdl_player(url)
+	players[server.id] = player
+	player.start()
+	
+@client.command(pass_context=True)	
+async def pause(ctx):
+	server = ctx.message.server
+	player = players[server.id]
+	player.pause()
+			
 client.run(TOKEN)
