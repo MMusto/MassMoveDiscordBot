@@ -69,20 +69,26 @@ def get_channel(server, chname : str) -> "Channel":
 	return None
 		
 @client.command(pass_context=True)
-async def mcc(ctx, chname1 : str, chname2 : str, role = None) -> None:
+async def mcc(ctx, chname1 : str, chname2 : str, *arg) -> None:
 	'''"Move-Channel-to-Channel" : .mcc (CHANNEL 1) (CHANNEL 2) -  Moves everyone from Channel 1 to Channel 2'''
 	if ctx.message.author.server_permissions.move_members:
 		server = ctx.message.server
 		ch1 = get_channel(server, chname1)
 		ch2 = get_channel(server, chname2)
-		if(ch1 == None and ch2 != None):
-			await client.say("Sorry, '" + chname1 + "' could not be found.")
-		elif(ch2 == None and ch1 != None):
-			await client.say("Sorry, '" + chname2 + "' could not be found.")
-		elif(ch2 == None and ch1 == None):
-			await client.say("Sorry, both '" + chname1 + "' and  '" + chname2 + "' could not be found.")
+		if role == None:
+			if(ch1 == None and ch2 != None):
+				await client.say("Sorry, '" + chname1 + "' could not be found.")
+			elif(ch2 == None and ch1 != None):
+				await client.say("Sorry, '" + chname2 + "' could not be found.")
+			elif(ch2 == None and ch1 == None):
+				await client.say("Sorry, both '" + chname1 + "' and  '" + chname2 + "' could not be found.")
+			else:
+				lst = [member for member in ch1.voice_members]
+				for member in lst:
+					await client.move_member(member, ch2)
 		else:
-			mbr_helper(server, role, ch2)
+			for role in arg:
+				await mbr_helper(server, role, ch2)
 	else:
 		await client.say("Sorry you don't have permissions for that.")
 	await client.delete_message(ctx.message)
