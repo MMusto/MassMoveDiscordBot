@@ -69,7 +69,7 @@ def get_channel(server, chname : str) -> "Channel":
 	return None
 		
 @client.command(pass_context=True)
-async def mcc(ctx, chname1 : str, chname2 : str) -> None:
+async def mcc(ctx, chname1 : str, chname2 : str, role = None) -> None:
 	'''"Move-Channel-to-Channel" : .mcc (CHANNEL 1) (CHANNEL 2) -  Moves everyone from Channel 1 to Channel 2'''
 	if ctx.message.author.server_permissions.move_members:
 		server = ctx.message.server
@@ -82,13 +82,29 @@ async def mcc(ctx, chname1 : str, chname2 : str) -> None:
 		elif(ch2 == None and ch1 == None):
 			await client.say("Sorry, both '" + chname1 + "' and  '" + chname2 + "' could not be found.")
 		else:
-			lst = [member for member in ch1.voice_members]
-			for member in lst:
-				await client.move_member(member, ch2)
-		await client.delete_message(ctx.message)
+			mbr_helper(server, role, ch2)
 	else:
 		await client.say("Sorry you don't have permissions for that.")
-		
+	await client.delete_message(ctx.message)
+	
+async def mbr_helper(server, role : str, ch):
+	'''Based off mbr. Integrated for use in .mcc'''
+	got_role = get_role(server, role)
+	all_members = server.members
+			
+	if(ch == None and got_role == None):
+		await client.say("Sorry, both '" + chname + "' and '" + role + "' could not be found.")
+	elif(ch == None):
+		await client.say("Sorry, '" + chname + "' could not be found.")
+	elif(got_role == None):
+		await client.say("Sorry, '" + role + "' could not be found.")
+	for member in all_members:
+		if(member.voice_channel != None and member.voice_channel != ch and not member.is_afk):
+			for rolee in member.roles:
+				if rolee == got_role:
+					await client.move_member(member, ch)
+					#await client.say("Moved Member: " + member.name + " with role " + got_role.name + " to channel " + ch.name)
+					
 @client.command(pass_context=True)
 async def mbr(ctx, role : str, chname : str) -> None:
 	'''"Move-By-Role" : .mbr (ROLE_NAME) (CHANNEL x) -  Moves everyone from with Role ROLE_NAME to Channel x'''
@@ -110,9 +126,9 @@ async def mbr(ctx, role : str, chname : str) -> None:
 					if rolee == got_role:
 						await client.move_member(member, ch)
 						#await client.say("Moved Member: " + member.name + " with role " + got_role.name + " to channel " + ch.name)
-		await client.delete_message(ctx.message)
 	else:
 		await client.say("Sorry you don't have permissions for that.")
+	await client.delete_message(ctx.message)
 					
 def get_role(server, role : str) -> 'Role':
 	'''Helper function that returns Role object from name snippet'''
