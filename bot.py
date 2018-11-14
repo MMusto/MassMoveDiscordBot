@@ -75,7 +75,7 @@ async def mcc(ctx, chname1 : str, chname2 : str, *arg) -> None:
 		server = ctx.message.server
 		ch1 = get_channel(server, chname1)
 		ch2 = get_channel(server, chname2)
-		if role == arg:
+		if arg == ():
 			if(ch1 == None and ch2 != None):
 				await client.say("Sorry, '" + chname1 + "' could not be found.")
 			elif(ch2 == None and ch1 != None):
