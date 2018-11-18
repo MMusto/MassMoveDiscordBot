@@ -379,12 +379,15 @@ async def resume(con):
 @client.command(pass_context=True)
 async def lib(ctx, url):
 	#url = 'sound\\' + url
-	channel = ctx.message.author.voice.voice_channel
-	server= ctx.message.server
-	if client.voice_client_in(server) == None:
-		await client.join_voice_channel(channel)
-	voice_client = client.voice_client_in(server)
-	player = voice_client.create_ffmpeg_player(filename = url)
-	player.start()
+	if lib != 'list':
+		channel = ctx.message.author.voice.voice_channel
+		server= ctx.message.server
+		if client.voice_client_in(server) == None:
+			await client.join_voice_channel(channel)
+		voice_client = client.voice_client_in(server)
+		player = voice_client.create_ffmpeg_player(filename = url)
+		player.start()
+	else:
+		await client.say("MP3 Name List: bencry, benKO, noi, SFCL, money, pussyboi, zackstop, chillis")
 	
 client.run(TOKEN)
