@@ -256,12 +256,9 @@ async def queue_songs(con,clear):
         if len(song_names[con.message.server.id]) ==0 and servers_songs[con.message.server.id] == None:
             player_status[con.message.server.id]=False
         
-
 async def after_song(con,clear):
     client.loop.create_task(queue_songs(con,clear))
     client.loop.create_task(check_voice(con))
-
-
 
 @client.command(pass_context=True)
 async def play(con,*,url):
@@ -379,6 +376,7 @@ async def resume(con):
 @client.command(pass_context=True)
 async def lib(ctx, url):
 	#url = 'sound\\' + url
+	url = url.lower()
 	if url != 'list':
 		channel = ctx.message.author.voice.voice_channel
 		server= ctx.message.server
@@ -388,6 +386,6 @@ async def lib(ctx, url):
 		player = voice_client.create_ffmpeg_player(filename = url+'.mp3')
 		player.start()
 	else:
-		await client.say("MP3 Name List: bencry, benKO, noi, SFCL, money, pussyboi, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, iloveubitch, slaverysorry, roadwork")
+		await client.say("MP3 Name List: bencry, benKO, noi, sfcl, money, pussyboi, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, iloveubitch, slaverysorry, roadwork, delisioso, online, skate, cowboy, countryboy, oovoo, chickens, okay")
 	
 client.run(TOKEN)
