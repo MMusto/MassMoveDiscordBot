@@ -386,6 +386,10 @@ async def lib(ctx, url):
 		player = voice_client.create_ffmpeg_player(filename = url+'.mp3')
 		player.start()
 	else:
-		await client.say("MP3 Name List: bencry, benKO, noi, sfcl, money, pussyboi, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, iloveubitch, slaverysorry, roadwork, delisioso, online, skate, cowboy, countryboy, oovoo, chickens, okay")
+		await client.say("MP3 Name List: bencry, benko, noi, sfcl, money, pussyboi, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, iloveubitch, slaverysorry, roadwork, delicioso, online, skate, cowboy, countryboy, oovoo, chickens, okay")
 	
+@client.command(pass_context = True)
+async def setgame(ctx, gam):
+	if ctx.message.author.server_permissions.move_members:
+		await client.change_presence(game=discord.Game(name=gam))
 client.run(TOKEN)
