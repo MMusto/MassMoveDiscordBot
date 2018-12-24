@@ -402,8 +402,7 @@ async def gas(ctx, *arg):
 		server = ctx.message.server
 		channel = get_channel(server, "gas")
 		voice = await client.join_voice_channel(channel)
-		player = await voice.create_ytdl_player("https://www.youtube.com/watch?v=jdZ21EkuxfU")
-		player.start()
+		player = voice.create_ffmpeg_player('gas.mp3')
 		members = set()
 		names = [name.lower() for name in arg]
 		for member in server.members:
@@ -423,5 +422,6 @@ async def gas(ctx, *arg):
 				break
 		for member in members:
 			await client.move_member(member, channel)
+		player.start()
 		
 client.run(TOKEN)
