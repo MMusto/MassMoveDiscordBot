@@ -400,7 +400,7 @@ async def setgame(ctx, gam):
 async def gas(ctx, *arg):
 	if ctx.message.author.server_permissions.move_members:
 		server = ctx.message.server
-		channel = discord.utils.get(server.channels, name='Gas Chamber', type=ChannelType.voice)
+		channel = get_channel(server, "gas")
 		voice = await client.join_voice_channel(channel)
 		player = await voice.create_ytdl_player("https://www.youtube.com/watch?v=jdZ21EkuxfU")
 		members = []
