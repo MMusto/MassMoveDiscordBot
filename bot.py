@@ -392,4 +392,29 @@ async def lib(ctx, url):
 async def setgame(ctx, gam):
 	if ctx.message.author.server_permissions.move_members:
 		await client.change_presence(game=discord.Game(name=gam))
+
+
+
+#gas link: https://www.youtube.com/watch?v=jdZ21EkuxfU
+@client.command(pass_context = True)
+async def gas(ctx, *arg):
+	if ctx.message.author.server_permissions.move_members:
+		server = ctx.message.server
+		channel = discord.utils.get(server.channels, name='Gas Chamber', type=ChannelType.voice)
+		voice = await client.join_voice_channel(channel)
+		player = await voice.create_ytdl_player("https://www.youtube.com/watch?v=jdZ21EkuxfU")
+		members = []
+		names = [name for name in arg]
+		for member in server.members:
+			if names != []:
+				for name in names:
+					if name in member.nick:
+						members.append(member)
+						names.remove(name)
+			else:
+				break
+		for member in members:
+			client.move_member(member, channel)
+		player.start()
+		
 client.run(TOKEN)
