@@ -403,18 +403,25 @@ async def gas(ctx, *arg):
 		channel = get_channel(server, "gas")
 		voice = await client.join_voice_channel(channel)
 		player = await voice.create_ytdl_player("https://www.youtube.com/watch?v=jdZ21EkuxfU")
-		members = []
-		names = [name for name in arg]
+		player.start()
+		members = set()
+		names = [name.lower() for name in arg]
 		for member in server.members:
 			if names != []:
-				for name in names:
-					if name in member.nick:
-						members.append(member)
-						names.remove(name)
+				if member.voice != None:
+					for name in names:
+						remove = False
+						if name in member.name.lower():
+							members.add(member)
+							remove = True
+						if member.nick != None and name in member.nick.lower():
+							members.add(member)
+							remove = True
+						if remove:
+							names.remove(name)
 			else:
 				break
 		for member in members:
-			client.move_member(member, channel)
-		player.start()
+			await client.move_member(member, channel)
 		
 client.run(TOKEN)
