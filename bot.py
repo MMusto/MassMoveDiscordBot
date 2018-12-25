@@ -394,9 +394,9 @@ async def gas(ctx, *arg):
 	if ctx.message.author.server_permissions.move_members:
 		server = ctx.message.server
 		channel = get_channel(server, "gas")
+		voice = await client.join_voice_channel(channel)
 		player = voice.create_ffmpeg_player(filename = 'gas.mp3')
 		members = set()
-		voice = await client.join_voice_channel(channel)
 		names = [name.lower() for name in arg]
 		for member in server.members:
 			if names != []:
