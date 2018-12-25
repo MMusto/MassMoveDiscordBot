@@ -187,12 +187,9 @@ async def on_reaction_add(reaction, user):
 # async def join(ctx):
 	# channel = ctx.message.author.voice.voice_channel
 	# await client.join_voice_channel(channel)
-	
 # @client.command(pass_context=True)			
-# async def leave(ctx):
-	# server = ctx.message.server
-	# voice_client = client.voice_client_in(server)
-	# await voice_client.disconnect()
+			
+
 	
 # @client.command(pass_context=True)	
 # async def play(ctx, url):
@@ -393,17 +390,14 @@ async def setgame(ctx, gam):
 	if ctx.message.author.server_permissions.move_members:
 		await client.change_presence(game=discord.Game(name=gam))
 
-
-
-#gas link: https://www.youtube.com/watch?v=jdZ21EkuxfU
 @client.command(pass_context = True)
 async def gas(ctx, *arg):
 	if ctx.message.author.server_permissions.move_members:
 		server = ctx.message.server
 		channel = get_channel(server, "gas")
-		voice = await client.join_voice_channel(channel)
-		player = voice.create_ffmpeg_player('gas.mp3')
+		player = voice.create_ffmpeg_player(filename = 'gas.mp3')
 		members = set()
+		voice = await client.join_voice_channel(channel)
 		names = [name.lower() for name in arg]
 		for member in server.members:
 			if names != []:
