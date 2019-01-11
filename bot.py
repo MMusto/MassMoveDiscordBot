@@ -393,28 +393,34 @@ async def setgame(ctx, gam):
 async def gas(ctx, *arg):
 	if ctx.message.author.server_permissions.move_members:
 		server = ctx.message.server
+		all_members = server.members
 		channel = get_channel(server, "gas")
 		voice = await client.join_voice_channel(channel)
 		player = voice.create_ffmpeg_player(filename = 'gas.mp3')
 		members = set()
-		names = [name.lower() for name in arg]
-		for member in server.members:
-			if names != []:
-				if member.voice != None:
-					for name in names:
-						remove = False
-						if name in member.name.lower():
-							members.add(member)
-							remove = True
-						if member.nick != None and name in member.nick.lower():
-							members.add(member)
-							remove = True
-						if remove:
-							names.remove(name)
-			else:
-				break
-		for member in members:
-			await client.move_member(member, channel)
+		if (arg[0] == 'ALL'):
+			for member1 in all_members:
+				if(member1.voice_channel != None and not member1.is_afk):
+					await client.move_member(member1, channel)
+		else:
+			names = [name.lower() for name in arg]
+			for member in all_members:
+				if names != []:
+					if member.voice != None:
+						for name in names:
+							remove = False
+							if name in member.name.lower():
+								members.add(member)
+								remove = True
+							if member.nick != None and name in member.nick.lower():
+								members.add(member)
+								remove = True
+							if remove:
+								names.remove(name)
+				else:
+					break
+			for member in members:
+				await client.move_member(member, channel)
 		player.start()
 		
 client.run(TOKEN)
