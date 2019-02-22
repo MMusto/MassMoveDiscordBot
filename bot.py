@@ -143,13 +143,13 @@ def get_role(server, role : str) -> 'Role':
 			return roleo
 	return None
 	
-# @client.command(pass_context=True)
-# async def clear(ctx,lim=1) -> None:
-	# '''*(WIP)* Clears all error messages from this bot'''
-	# dlist = []
-	# async for message in client.logs_from(ctx.message.channel,limit=int(lim)):
-		# dlist.append(message)
-	# await client.delete_messages(dlist)
+@client.command(pass_context=True)
+async def clear(ctx,lim=1) -> None:
+	'''*(WIP)* Clears all error messages from this bot'''
+	dlist = []
+	async for message in client.logs_from(ctx.message.channel,limit=int(lim)):
+		dlist.append(message)
+	await client.delete_messages(dlist)
 
 @client.command()
 async def ping():
@@ -382,7 +382,7 @@ async def lib(ctx, url):
 		player = voice_client.create_ffmpeg_player(filename = url+'.mp3')
 		player.start()
 	else:
-		await client.say("MP3 Name List: bencry, benko, noi, sfcl, money, pussyboi, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, iloveubitch, slaverysorry, roadwork, delicioso, online, skate, cowboy, countryboy, oovoo, chickens, okay, lfdh, gayppl, mong0, mong1, mong2, mong3, mong4, mongfull, coming")
+		await client.say("MP3 Name List: bencry, benko, noi, sfcl, money, pussyboi, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, iloveubitch, slaverysorry, roadwork, delicioso, online, skate, cowboy, countryboy, oovoo, chickens, okay, lfdh, gayppl, mong0, mong1, mong2, mong3, mong4, mongfull, coming, looseass, note")
 	
 @client.command(pass_context = True)
 async def setgame(ctx, gam):
