@@ -4,7 +4,7 @@ import os
 import youtube_dl
 from discord import opus
 
-TOKEN = "NDk2MDM5MTg4ODE5NjA3NTYy.DpWf2Q.2MoDayzaQmx99lKkpB4Fvd1k6OQ"#os.environ["TOKEN"]
+TOKEN = os.environ["TOKEN"]
 client = commands.Bot(command_prefix = '.')
 
 @client.event
