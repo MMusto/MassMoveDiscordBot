@@ -4,40 +4,18 @@ import os
 import youtube_dl
 from discord import opus
 
-TOKEN = os.environ["TOKEN"]
+TOKEN = "NDk2MDM5MTg4ODE5NjA3NTYy.DpWf2Q.2MoDayzaQmx99lKkpB4Fvd1k6OQ"#os.environ["TOKEN"]
 client = commands.Bot(command_prefix = '.')
-
-OPUS_LIBS = ['libopus-0.x86.dll', 'libopus-0.x64.dll',
-             'libopus-0.dll', 'libopus.so.0', 'libopus.0.dylib']
-
-
-def load_opus_lib(opus_libs=OPUS_LIBS):
-    if opus.is_loaded():
-        return True
-
-    for opus_lib in opus_libs:
-            try:
-                opus.load_opus(opus_lib)
-                return
-            except OSError:
-                pass
-
-    raise RuntimeError('Could not load an opus lib. Tried %s' %
-                       (', '.join(opus_libs)))
-opts = {
-    'default_search': 'auto',
-    'quiet': True,
-}  # youtube_dl options
-
-load_opus_lib()
-players = {}
 
 @client.event
 async def on_ready():
 	client.loop.create_task(bg())
 	print(client.user.name)
 	print("**********THE BOT IS READY**********")
-	
+
+######################################## MASS_MOVE FUNCTIONS ############################################
+######################################## MASS_MOVE FUNCTIONS ############################################	
+
 @client.command(pass_context=True)
 async def mah(ctx) -> None:
 	'''"Move-All-Here" : Moves everyone to your current voice channel '''
@@ -46,12 +24,8 @@ async def mah(ctx) -> None:
 	all_members = server.members
 	channels = server.channels
 	if author.server_permissions.move_members:
-		#Finds voice channel that author is in
-		for channel in channels:
-			if(str(channel.type) == 'voice' and  author in channel.voice_members):
-					move_channel = channel
-					break
-		#Moves all people to your channel that was found above
+		move_channel = author.voice.voice_channel
+		#Moves all people to author's channel
 		for member in all_members:
 			if(member.voice_channel != None and not member.is_afk and member != author):
 				await client.move_member(member, move_channel)
@@ -59,14 +33,6 @@ async def mah(ctx) -> None:
 		await client.delete_message(ctx.message)
 	else:
 		await client.say("Sorry you don't have permissions for that.")
-		
-def get_channel(server, chname : str) -> "Channel":
-	'''Helper function that returns Channel object from name snippet'''
-	for channel in server.channels:
-			if(str(channel.type) == 'voice'):
-					if(chname.lower() in channel.name.lower()):
-							return channel
-	return None
 		
 @client.command(pass_context=True)
 async def mcc(ctx, chname1 : str, chname2 : str, *arg) -> None:
@@ -88,28 +54,12 @@ async def mcc(ctx, chname1 : str, chname2 : str, *arg) -> None:
 					await client.move_member(member, ch2)
 		else:
 			for role in arg:
-				await mbr_helper(server, role, ch2)
+				await mbr_helper(server, role, ch1, ch2)
 	else:
 		await client.say("Sorry you don't have permissions for that.")
 	await client.delete_message(ctx.message)
 	
-async def mbr_helper(server, role : str, ch):
-	'''Based off mbr. Integrated for use in .mcc'''
-	got_role = get_role(server, role)
-	all_members = server.members
-			
-	if(ch == None and got_role == None):
-		await client.say("Sorry, both '" + chname + "' and '" + role + "' could not be found.")
-	elif(ch == None):
-		await client.say("Sorry, '" + chname + "' could not be found.")
-	elif(got_role == None):
-		await client.say("Sorry, '" + role + "' could not be found.")
-	for member in all_members:
-		if(member.voice_channel != None and member.voice_channel != ch and not member.is_afk):
-			for rolee in member.roles:
-				if rolee == got_role:
-					await client.move_member(member, ch)
-					#await client.say("Moved Member: " + member.name + " with role " + got_role.name + " to channel " + ch.name)
+
 					
 @client.command(pass_context=True)
 async def mbr(ctx, role : str, chname : str) -> None:
@@ -135,25 +85,24 @@ async def mbr(ctx, role : str, chname : str) -> None:
 	else:
 		await client.say("Sorry you don't have permissions for that.")
 	await client.delete_message(ctx.message)
-					
-def get_role(server, role : str) -> 'Role':
-	'''Helper function that returns Role object from name snippet'''
-	for roleo in server.roles:
-		if role.lower() in roleo.name.lower():
-			return roleo
-	return None
+
+######################################## END OF MASS_MOVE FUNCTIONS ############################################
+######################################## END OF MASS_MOVE FUNCTIONS ############################################		
+
 	
 @client.command(pass_context=True)
 async def clear(ctx,lim=1) -> None:
 	'''*(WIP)* Clears all error messages from this bot'''
-	dlist = []
-	async for message in client.logs_from(ctx.message.channel,limit=int(lim)):
-		dlist.append(message)
-	await client.delete_messages(dlist)
+	if(user.server_permissions.manage_messages):
+		dlist = []
+		async for message in client.logs_from(ctx.message.channel,limit=int(lim)):
+			dlist.append(message)
+		await client.delete_messages(dlist)
 
-@client.command()
-async def ping():
-	await client.say("Pong!")
+@client.command(pass_context = True)
+async def setgame(ctx, gam):
+	if ctx.message.author.server_permissions.move_members:
+		await client.change_presence(game=discord.Game(name=gam))
 		
 @client.event
 async def on_reaction_add(reaction, user):
@@ -183,29 +132,124 @@ async def on_reaction_add(reaction, user):
 			#await client.delete_message(first)
 			await client.delete_messages(dlist)
 
-# @client.command(pass_context=True)			
-# async def join(ctx):
-	# channel = ctx.message.author.voice.voice_channel
-	# await client.join_voice_channel(channel)
-			
 
+@client.command(pass_context=True)
+async def lib(ctx, url):
+	#url = 'sound\\' + url
+	url = url.lower()
+	if url != 'list':
+		channel = ctx.message.author.voice.voice_channel
+		server = ctx.message.server
+		if client.voice_client_in(server) == None:
+			await client.join_voice_channel(channel)
+		voice_client = client.voice_client_in(server)
+		player = voice_client.create_ffmpeg_player(filename = url+'.mp3')
+		player.start()
+	else:
+		await client.say("MP3 Name List: bencry, benko, noi, sfcl, money, pussyboi, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, iloveubitch, slaverysorry, roadwork, delicioso, online, skate, cowboy, countryboy, oovoo, chickens, okay, lfdh, gayppl, mong0, mong1, mong2, mong3, mong4, mongfull, coming, looseass, note, suh")
 	
-# @client.command(pass_context=True)	
-# async def play(ctx, url):
-	# channel = ctx.message.author.voice.voice_channel
-	# server= ctx.message.server
-	# if client.voice_client_in(server) == None:
-		# await client.join_voice_channel(channel)
-	# voice_client = client.voice_client_in(server)
-	# player = await voice_client.create_ytdl_player(url)
-	# players[server.id] = player
-	# player.start()
+@client.command(pass_context = True)
+async def gas(ctx, *arg):
+	if ctx.message.author.server_permissions.move_members:
+		server = ctx.message.server
+		all_members = server.members
+		channel = get_channel(server, "gas")
+		voice = await client.join_voice_channel(channel)
+		player = voice.create_ffmpeg_player(filename = 'gas.mp3')
+		members = set()
+		if (arg[0] == 'ALL'):
+			for member1 in all_members:
+				if(member1.voice_channel != None and not member1.is_afk):
+					await client.move_member(member1, channel)
+		else:
+			names = [name.lower() for name in arg]
+			for member in all_members:
+				if names != []:
+					if member.voice != None:
+						for name in names:
+							remove = False
+							if name in member.name.lower():
+								members.add(member)
+								remove = True
+							if member.nick != None and name in member.nick.lower():
+								members.add(member)
+								remove = True
+							if remove:
+								names.remove(name)
+				else:
+					break
+			for member in members:
+				await client.move_member(member, channel)
+		player.start()
+
+		
+######################################## HELPER FUNCTIONS ############################################
+######################################## HELPER FUNCTIONS ############################################	
+
+def get_channel(server, chname : str) -> "Channel":
+	'''Helper function that returns Channel object from name snippet'''
+	for channel in server.channels:
+			if(str(channel.type) == 'voice'):
+					if(chname.lower() in channel.name.lower()):
+							return channel
+	return None
 	
-# @client.command(pass_context=True)	
-# async def pause(ctx):
-	# server = ctx.message.server
-	# player = players[server.id]
-	# player.pause()
+async def mbr_helper(server, role : str, ch1, ch2):
+	'''Based off mbr. Integrated for use in .mcc'''
+	got_role = get_role(server, role)
+			
+	if(ch1 == None and ch2 == None and got_role == None):
+		await client.say("Sorry, channels or roles could not be found.")
+	elif(ch1 == None):
+		await client.say("Sorry, '" + ch1.name + "' could not be found.")
+	elif(ch2 == None):
+		await client.say("Sorry, '" + ch2.name + "' could not be found.")
+	elif(got_role == None):
+		await client.say("Sorry, '" + role + "' could not be found.")
+
+	all_members = ch1.voice_members
+	for member in all_members:
+		for rolee in member.roles:
+			if rolee == got_role:
+				await client.move_member(member, ch2)
+
+def get_role(server, role : str) -> 'Role':
+	'''Helper function that returns Role object from name snippet'''
+	for roleo in server.roles:
+		if role.lower() in roleo.name.lower():
+			return roleo
+	return None
+					
+######################################## END OF HELPER FUNCTIONS ############################################
+######################################## END OF HELPER FUNCTIONS ############################################
+
+
+########################################  Music Player Functions   ############################################
+########################################  Music Player Functions   ############################################
+OPUS_LIBS = ['libopus-0.x86.dll', 'libopus-0.x64.dll',
+             'libopus-0.dll', 'libopus.so.0', 'libopus.0.dylib']
+
+
+def load_opus_lib(opus_libs=OPUS_LIBS):
+    if opus.is_loaded():
+        return True
+
+    for opus_lib in opus_libs:
+            try:
+                opus.load_opus(opus_lib)
+                return
+            except OSError:
+                pass
+
+    raise RuntimeError('Could not load an opus lib. Tried %s' %
+                       (', '.join(opus_libs)))
+opts = {
+    'default_search': 'auto',
+    'quiet': True,
+}  # youtube_dl options
+
+load_opus_lib()
+players = {}
 servers_songs={}
 player_status={}
 now_playing={}
@@ -368,59 +412,10 @@ async def resume(con):
             if paused[con.message.server.id] ==True:
                 servers_songs[con.message.server.id].resume()
                 paused[con.message.server.id]=False
+				
 
-@client.command(pass_context=True)
-async def lib(ctx, url):
-	#url = 'sound\\' + url
-	url = url.lower()
-	if url != 'list':
-		channel = ctx.message.author.voice.voice_channel
-		server= ctx.message.server
-		if client.voice_client_in(server) == None:
-			await client.join_voice_channel(channel)
-		voice_client = client.voice_client_in(server)
-		player = voice_client.create_ffmpeg_player(filename = url+'.mp3')
-		player.start()
-	else:
-		await client.say("MP3 Name List: bencry, benko, noi, sfcl, money, pussyboi, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, iloveubitch, slaverysorry, roadwork, delicioso, online, skate, cowboy, countryboy, oovoo, chickens, okay, lfdh, gayppl, mong0, mong1, mong2, mong3, mong4, mongfull, coming, looseass, note, suh")
-	
-@client.command(pass_context = True)
-async def setgame(ctx, gam):
-	if ctx.message.author.server_permissions.move_members:
-		await client.change_presence(game=discord.Game(name=gam))
+######################################## End of Music Player Functions   ############################################
+######################################## End of Music Player Functions   ############################################
 
-@client.command(pass_context = True)
-async def gas(ctx, *arg):
-	if ctx.message.author.server_permissions.move_members:
-		server = ctx.message.server
-		all_members = server.members
-		channel = get_channel(server, "gas")
-		voice = await client.join_voice_channel(channel)
-		player = voice.create_ffmpeg_player(filename = 'gas.mp3')
-		members = set()
-		if (arg[0] == 'ALL'):
-			for member1 in all_members:
-				if(member1.voice_channel != None and not member1.is_afk):
-					await client.move_member(member1, channel)
-		else:
-			names = [name.lower() for name in arg]
-			for member in all_members:
-				if names != []:
-					if member.voice != None:
-						for name in names:
-							remove = False
-							if name in member.name.lower():
-								members.add(member)
-								remove = True
-							if member.nick != None and name in member.nick.lower():
-								members.add(member)
-								remove = True
-							if remove:
-								names.remove(name)
-				else:
-					break
-			for member in members:
-				await client.move_member(member, channel)
-		player.start()
 		
 client.run(TOKEN)
