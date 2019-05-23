@@ -17,6 +17,7 @@ async def on_ready():
 ######################################## MASS_MOVE FUNCTIONS ############################################    
 @client.command(pass_context = True)
 async def mg(ctx, game, chname):
+    '''""Move game": Moves everyone playing "game" to the "channel"'''
     author = ctx.message.author
     server = author.server
     all_members = server.members
@@ -171,35 +172,35 @@ async def gas(ctx, *arg):
         channel = get_channel(server, "gas")
         voice = await client.join_voice_channel(channel)
         player = voice.create_ffmpeg_player(filename = 'gas.mp3')
-        members = set()
+        members_to_move = set()
         if (arg[0] == 'ALL'):
             for member1 in all_members:
                 if(member1.voice_channel != None and not member1.is_afk):
                     await client.move_member(member1, channel)
         else:
             names = [name.lower() for name in arg]
-            for member in all_members:
-                if names != []:
+            if names != []:
+                for member in all_members:
                     if member.voice != None:
                         for name in names:
                             remove = False
                             if name in member.name.lower():
-                                members.add(member)
+                                members_to_move.add(member)
                                 remove = True
                             if member.nick != None and name in member.nick.lower():
-                                members.add(member)
+                                members_to_move.add(member)
                                 remove = True
                             if remove:
                                 names.remove(name)
-                else:
-                    break
-            for member in members:
-                await client.move_member(member, channel)
+                for member in members_to_move:
+                    await client.move_member(member, channel)
         player.start()
 
         
 ######################################## HELPER FUNCTIONS ############################################
 ######################################## HELPER FUNCTIONS ############################################    
+
+def move_all(server, chname: str) -> "None"
 
 def get_channel(server, chname : str) -> "Channel":
     '''Helper function that returns Channel object from name snippet'''
@@ -209,7 +210,7 @@ def get_channel(server, chname : str) -> "Channel":
                             return channel
     return None
     
-async def mbr_helper(server, role : str, ch1, ch2):
+async def mbr_helper(server, role : str, ch1, ch2) -> "None":
     '''Based off mbr. Integrated for use in .mcc'''
     got_role = get_role(server, role)
             
