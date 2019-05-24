@@ -200,8 +200,6 @@ async def gas(ctx, *arg):
 ######################################## HELPER FUNCTIONS ############################################
 ######################################## HELPER FUNCTIONS ############################################    
 
-def move_all(server, chname: str) -> "None"
-
 def get_channel(server, chname : str) -> "Channel":
     '''Helper function that returns Channel object from name snippet'''
     for channel in server.channels:
