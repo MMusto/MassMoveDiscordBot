@@ -4,7 +4,10 @@ import os
 import youtube_dl
 from discord import opus
 
+#Token is stored in Heroku environment to avoid 
+#the vulnerability of private Discord bot key exposed to public
 TOKEN = os.environ["TOKEN"]
+
 client = commands.Bot(command_prefix = '.')
 
 @client.event
@@ -151,7 +154,7 @@ async def on_reaction_add(reaction, user):
 
 @client.command(pass_context=True)
 async def lib(ctx, url):
-    #url = 'sound\\' + url
+    #url = 'src\\' + url
     url = url.lower()
     if url != 'list':
         channel = ctx.message.author.voice.voice_channel
@@ -162,16 +165,17 @@ async def lib(ctx, url):
         player = voice_client.create_ffmpeg_player(filename = url+'.mp3')
         player.start()
     else:
-        await client.say("MP3 Name List: bencry, benko, noi, sfcl, money, pussyboi, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, iloveubitch, slaverysorry, roadwork, delicioso, online, skate, cowboy, countryboy, oovoo, chickens, okay, lfdh, gayppl, mong0, mong1, mong2, mong3, mong4, mongfull, coming, looseass, note, suh")
+        await client.say("MP3 Name List: bencry, benko, noi, sfcl, money, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, roadwork, delicioso, online, skate, cowboy, countryboy, oovoo, chickens, okay")
     
 @client.command(pass_context = True)
-async def gas(ctx, *arg):
+async def group(ctx, *arg):
+    """ *(WIP)* gathers everyone to channel "name_here" and plays "audio.mp3" """
     if ctx.message.author.server_permissions.move_members:
         server = ctx.message.server
         all_members = server.members
-        channel = get_channel(server, "gas")
+        channel = get_channel(server, "name_here")
         voice = await client.join_voice_channel(channel)
-        player = voice.create_ffmpeg_player(filename = 'gas.mp3')
+        player = voice.create_ffmpeg_player(filename = 'audio.mp3')
         members_to_move = set()
         if (arg[0] == 'ALL'):
             for member1 in all_members:
