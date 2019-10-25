@@ -4,9 +4,9 @@ A Python based Discord bot that has a plethora of features including the ability
 This bot can be run from your own computer or a dedicated host such as Heroku (This is how I run the bot 24/7 for free). 
 
 Requirements are as follows:
-1. All the dependencies setup for the Discord.py API wrapper found here: [Link](https://github.com/Rapptz/discord.py)
+1. Discord.py API wrapper found here: [Link](https://github.com/Rapptz/discord.py)
 2. Python 3.6.1
-3. A disord bot that is setup already. (You can create a new one [here](https://discordapp.com/developers/applications/))
+3. A Discord app. (You can create one [here](https://discordapp.com/developers/applications/))
 
 ## Setup
 The **bot.py** is where the main app is run from. At the top of this file there are a few lines of config. The most important variables you need to modify are **TOKEN, mm_reaction_channel_name, and server_name**. 
