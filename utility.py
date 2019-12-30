@@ -5,7 +5,7 @@ import asyncio
 async def clear(ctx,lim=1) -> None:
     '''*(WIP)* Clears all error messages from this bot'''
     if(ctx.message.author.server_permissions.manage_messages):
-        deleted = await client.purge_from(channel = ctx.message.channel, limit=lim)
+        deleted = await client.purge_from(channel = ctx.message.channel, limit=lim+1)
         notification = await client.send_message(ctx.message.channel, "Deleted {} messages".format(len(deleted)))
         await asyncio.sleep(2)
         await client.delete_message(notification)
@@ -15,6 +15,6 @@ async def clear(ctx,lim=1) -> None:
             
 @client.command(pass_context = True)
 async def setgame(ctx, gam):
-    '''Modify game played by bot is friends list/status bar'''
+    '''Modify game played by bot in friends list/status bar'''
     if ctx.message.author.server_permissions.move_members:
         await client.change_presence(game=discord.Game(name=gam))
