@@ -58,7 +58,7 @@ async def start_mass_move_reactions():
         return
         
     await client.purge_from(channel = control_panel, limit=100)
-    await client.send_message(control_panel, channel_sep)
+    #await client.send_message(control_panel, channel_sep)
     for channel in sorted(voice_channels.keys(), key = lambda x: voice_channels[x].position):
         name = "**"+channel+"**"
         message = await client.send_message(control_panel, embed = discord.Embed(title = name))
