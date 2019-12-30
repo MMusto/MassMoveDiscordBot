@@ -60,10 +60,11 @@ async def start_mass_move_reactions():
     await client.purge_from(channel = control_panel, limit=100)
     await client.send_message(control_panel, channel_sep)
     for channel in sorted(voice_channels.keys(), key = lambda x: voice_channels[x].position):
-        message = await client.send_message(control_panel, "**"+channel+"**")
+        name = "**"+channel+"**"
+        message = await client.send_message(control_panel, embed = discord.Embed(title = name))
         await client.add_reaction(message, mm_reaction_emoji_1)
         await client.add_reaction(message, mm_reaction_emoji_2)
-        await client.send_message(control_panel, channel_sep)
+        #await client.send_message(control_panel, channel_sep)
     await client.send_message(control_panel, "**Click the " + mm_reaction_emoji_1 + " emoji underneath the channel you wish to move everyone from. Then click the " + mm_reaction_emoji_2 + " emoji underneath the channel you wish to move everyone to.**")
    
 @client.command(pass_context=True)
