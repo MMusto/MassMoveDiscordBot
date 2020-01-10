@@ -166,9 +166,9 @@ async def on_reaction_add(reaction, user):
     if user != client.user:
         if(user.server_permissions.manage_messages and reaction.message.channel == control_panel and reaction.emoji == mm_reaction_emoji_1):
             global voice_channels
-            ch1 = voice_channels[reaction.message.content.strip('*')]
+            ch1 = voice_channels[reaction.message.embeds[0].title.strip('*')]
             next_reaction, user = await client.wait_for_reaction(emoji = mm_reaction_emoji_2, user=user) #if person uses emoji on an unintended message, function breaks
-            ch2 = voice_channels[next_reaction.message.content.strip('*')]
+            ch2 = voice_channels[next_reaction.message.embeds[0].title.strip('*')]
             lst = {client.move_member(member, ch2) for member in ch1.voice_members}
             print("{}/{} moved everyone from {} to {}".format(user.display_name, user.name, ch1.name, ch2.name))
             await asyncio.gather(*lst)
