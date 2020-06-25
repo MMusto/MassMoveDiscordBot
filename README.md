@@ -40,6 +40,6 @@ The bot will automatically delete all messages in the reaction channel and inclu
 ![image of mass move reaction chat](https://i.imgur.com/HzqgyOG.png)
 
 
-You can change the emojis used by modifying the config variables at the top of the **bot.py** module. Also if you make changes that the reaction mass move feature needs to know about (such as adding or moving around channels), simply use the ".rr" command and the corresponding changes will be updated.
+You can change the emojis used by modifying the config variables at the top of the **bot.py** module. Also if you make any local changes that the running bot needs to know about (such as adding or moving around channels), simply use the ".rr" command and the corresponding changes will be updated. If you have any changes, bug fixes, or new feature ideas, simply reach out! Or if you would like to implement it yourself, go ahead and send a PR and I'll gladly take a look.
 
 # Enjoy!
