@@ -38,6 +38,9 @@ def get_role(server, role : str) -> 'Role':
         if role.lower() in roleo.name.lower():
             return roleo
     return None
+
+def permission_to_move(user):
+	return user.server_permissions.move_members;
                     
 ######################################## END OF HELPER FUNCTIONS ############################################
 ######################################## END OF HELPER FUNCTIONS ############################################

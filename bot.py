@@ -78,7 +78,7 @@ async def mg(ctx, game, chname):
     author = ctx.message.author
     server = author.server
     all_members = server.members
-    if author.server_permissions.move_members:
+    if permission_to_move(author):
         move_channel = get_channel(server, chname)
         #Moves all people to specified channel if they have game in their currently playing game
         for member in all_members:
@@ -96,7 +96,7 @@ async def mah(ctx) -> None:
     server = author.server
     all_members = server.members
     channels = server.channels
-    if author.server_permissions.move_members:
+    if permission_to_move(author):
         move_channel = author.voice.voice_channel
         #Moves all people to author's channel
         for member in all_members:
@@ -110,7 +110,7 @@ async def mah(ctx) -> None:
 @client.command(pass_context=True)
 async def mcc(ctx, chname1 : str, chname2 : str, *arg) -> None:
     ''' "Move-Channel-to-Channel" : .mcc (CHANNEL 1) (CHANNEL 2) [roles to move] -  Moves everyone from Channel 1 to Channel 2. If roles are included, only users with the specified roles will be moved '''
-    if ctx.message.author.server_permissions.move_members:
+    if permission_to_move(ctx.message.author):
         server = ctx.message.server
         ch1 = get_channel(server, chname1)
         ch2 = get_channel(server, chname2)
@@ -136,7 +136,7 @@ async def mcc(ctx, chname1 : str, chname2 : str, *arg) -> None:
 @client.command(pass_context=True)
 async def mbr(ctx, role : str, chname : str) -> None:
     ''' "Move-By-Role" : .mbr (ROLE_NAME) (CHANNEL x) -  Moves everyone from with ROLE_NAME in one of their roles to CHANNEL x '''
-    if ctx.message.author.server_permissions.move_members:
+    if permission_to_move(ctx.message.author):
         server = ctx.message.server
         ch = get_channel(server, chname)
         got_role = get_role(server, role)
