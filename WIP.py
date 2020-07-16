@@ -1,12 +1,14 @@
 @client.command(pass_context = True)
 async def group(ctx, *arg):
     """ *(WIP)* gathers everyone to channel "name_here" and plays "audio.mp3" """
+    group_listen_channel = "Gathering Room"
+    audio_file = 'audio.mp3'
     if ctx.message.author.server_permissions.move_members:
         server = ctx.message.server
         all_members = server.members
-        channel = get_channel(server, "name_here")
+        channel = get_channel(server, group_listen_channel)
         voice = await client.join_voice_channel(channel)
-        player = voice.create_ffmpeg_player(filename = 'audio.mp3')
+        player = voice.create_ffmpeg_player(filename = audio_file)
         members_to_move = set()
         if (arg[0] == 'ALL'):
             for member1 in all_members:
