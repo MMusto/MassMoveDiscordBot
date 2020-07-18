@@ -17,18 +17,17 @@ async def group(ctx, *arg):
         else:
             names = [name.lower() for name in arg]
             if names != []:
-                for member in all_members:
-                    if member.voice != None:
-                        for name in names:
-                            remove = False
-                            if name in member.name.lower():
-                                members_to_move.add(member)
-                                remove = True
-                            if member.nick != None and name in member.nick.lower():
-                                members_to_move.add(member)
-                                remove = True
-                            if remove:
-                                names.remove(name)
+                for member in [m in all_members if m.voice]:
+                    for name in names:
+                        remove = False
+                        if name in member.name.lower():
+                            members_to_move.add(member)
+                            remove = True
+                        if member.nick != None and name in member.nick.lower():
+                            members_to_move.add(member)
+                            remove = True
+                        if remove:
+                            names.remove(name)
                 for member in members_to_move:
                     await client.move_member(member, channel) #use asyncio.gather(*members_to_move) instead for concurrency?
         player.start()
