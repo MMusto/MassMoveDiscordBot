@@ -188,11 +188,10 @@ async def lib(ctx, url):
         if client.voice_client_in(server) == None:
             await client.join_voice_channel(channel)
         voice_client = client.voice_client_in(server)
-        player = voice_client.create_ffmpeg_player(filename = url+'.mp3')
+        player = voice_client.create_ffmpeg_player(filename = f'sounds\\{url}.mp3')
         player.start()
     else:
         await client.say("MP3 Name List: bencry, benko, noi, sfcl, money, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, roadwork, delicioso, online, skate, cowboy, countryboy, oovoo, chickens, okay")
 
 #Run bot
-        
 client.run(TOKEN)
