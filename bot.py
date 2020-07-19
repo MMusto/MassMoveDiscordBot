@@ -4,7 +4,7 @@ import youtube_dl
 import discord
 from discord import opus
 from helper import *
-import musicplayer
+#import musicplayer
 import asyncio
 import utility
 
