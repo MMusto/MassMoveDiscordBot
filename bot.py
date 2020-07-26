@@ -183,7 +183,7 @@ async def on_reaction_add(reaction, user):
             ch1 = client.get_channel(message_to_channel[reaction.message.id])
             
             def check(r,u):
-                return r.emoji == mm_reaction_emoji_2 and u == user
+                return r.emoji == mm_reaction_emoji_2 and u == user and r.message.id in message_to_channel
                 
             next_reaction, _ = await client.wait_for('reaction_add', check = check) #if person uses emoji on an unintended message, function breaks
             #ch2 = voice_channels[next_reaction.message.embeds[0].title.strip('*')]
@@ -197,8 +197,7 @@ async def on_reaction_add(reaction, user):
             await next_reaction.message.remove_reaction(mm_reaction_emoji_2, user)
             await asyncio.gather(*lst)
             
-            
-            
+
 @client.command(pass_context=True)
 async def lib(ctx, url):
     #url = 'src\\' + url
