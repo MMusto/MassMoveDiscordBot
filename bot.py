@@ -1,12 +1,17 @@
 from client import client as client
 import os
+from os import listdir
+from os.path import isfile, join
 import youtube_dl
 import discord
 from discord import opus
 from helper import *
-#import musicplayer
+from musicplayer  import *
 import asyncio
 import utility
+
+import sys
+print(sys.version)
 
 #Documentation used: https://discordpy.readthedocs.io/en/async/api.html
 
@@ -16,11 +21,12 @@ TOKEN = os.environ["TOKEN"]
 
 control_panel = None
 voice_channels = {}
+message_to_channel = {}
 mm_reaction_emoji_1 = '🔼'
 mm_reaction_emoji_2 = '🔵'
 mm_reaction_channel_name = 'mass-move-reactions'
 server_name = 'execute'
-channel_sep = "**--------------------------------------**"
+main_server = None
 
 @client.event
 async def on_ready():
@@ -37,126 +43,132 @@ async def start_mass_move_reactions():
     '''Init mass move'''
     global control_panel
     global voice_channels
+    global main_server
     
     exe = None
-    for server in client.servers:
+    async for server in client.fetch_guilds():
         if server_name in server.name.lower():
             exe = server
+            main_server = server
             break
     if not exe:
-        error("Exe not found in function 'start_mass_move_reactions'")
+        error(f"{server_name} not found in function 'start_mass_move_reactions'")
         return
-        
-    for channel in exe.channels:
-        if(str(channel.type) == 'voice'):
+   
+    channels = await exe.fetch_channels()
+    for channel in channels:
+        if type(channel) is discord.channel.VoiceChannel:
             voice_channels[channel.name] = channel
-        else:
-            if mm_reaction_channel_name in channel.name:
-                control_panel = channel
+        elif type(channel) is discord.channel.TextChannel and mm_reaction_channel_name in channel.name:
+            control_panel = channel
+            
     if not control_panel:
         error("Control Channel not found in function 'start_mass_move_reactions'")
         return
 		
-    await client.purge_from(channel = control_panel, limit=100)
+    await control_panel.purge(limit=100)
     #await client.send_message(control_panel, channel_sep)
     for channel in sorted(voice_channels.keys(), key = lambda x: voice_channels[x].position):
         name = "**"+channel+"**"
-        message = await client.send_message(control_panel, embed = discord.Embed(title = name))
-        await client.add_reaction(message, mm_reaction_emoji_1)
-        await client.add_reaction(message, mm_reaction_emoji_2)
+        message = await control_panel.send(embed = discord.Embed(title = name))
+        await message.add_reaction( mm_reaction_emoji_1)
+        await message.add_reaction( mm_reaction_emoji_2)
+        message_to_channel[message.id] = voice_channels[channel].id
         #await client.send_message(control_panel, channel_sep)
-    await client.send_message(control_panel, "**Click the " + mm_reaction_emoji_1 + " emoji underneath the channel you wish to move everyone from. Then click the " + mm_reaction_emoji_2 + " emoji underneath the channel you wish to move everyone to.**")
+    await control_panel.send( "**Click the " + mm_reaction_emoji_1 + " emoji underneath the channel you wish to move everyone from. Then click the " + mm_reaction_emoji_2 + " emoji underneath the channel you wish to move everyone to.**")
    
 @client.command(pass_context=True)
 async def rr(ctx):
-    if(ctx.message.author.server_permissions.manage_messages):
+    if(permission_to_move(ctx.message.author)):
         await start_mass_move_reactions()
     
 @client.command(pass_context = True)
 async def mg(ctx, game, chname):
     ''' "Move game": Moves everyone playing "game" to channel with chname in channel name '''
     author = ctx.message.author
-    server = author.server
+    server = author.guild
     all_members = server.members
     if permission_to_move(author):
         move_channel = get_channel(server, chname)
         #Moves all people to specified channel if they have game in their currently playing game
         for member in all_members:
-            print(member.game)
-            if(member.voice_channel != None and not member.is_afk and game.lower() in str(member.game).lower()):
-                await client.move_member(member, move_channel)
-        await client.say("Mass moved everyone playing " + game + " to " + str(move_channel))
+            if(member.voice != None and member.voice.channel and not member.voice.afk and game.lower() in str(member.game).lower()):
+                await member.move_to(move_channel)
+        await ctx.send(f"Mass moved everyone playing { game } to {str(move_channel)}")
     else:
-        await client.say("Sorry you don't have permissions for that.")
+        await ctx.send(f"Sorry you don't have permissions for that, {ctx.author.mention}")
         
 @client.command(pass_context=True)
 async def mah(ctx) -> None:
     ''' "Move-All-Here" : Moves everyone to your current voice channel '''
     author = ctx.message.author
-    server = author.server
+    server = author.guild
     all_members = server.members
     channels = server.channels
     if permission_to_move(author):
-        move_channel = author.voice.voice_channel
+        if author.voice:
+            move_channel = author.voice.channel
+        else:
+            await ctx.send(f"You have to be in a Voice Channel to use this command, {ctx.author.mention}")
+            return
         #Moves all people to author's channel
         for member in all_members:
-            if(member.voice_channel != None and not member.is_afk and member != author):
-                await client.move_member(member, move_channel)
-                await client.say("Mass moved everyone to " + str(move_channel))
-        await client.delete_message(ctx.message)
+            if(member.voice and not member.voice.afk and member != author):
+                await member.move_to(move_channel)
+        await ctx.send("Mass moved everyone to " + str(move_channel))
+        await ctx.message.delete()
     else:
-        await client.say("Sorry you don't have permissions for that.")
+        await ctx.send(f"Sorry you don't have permissions for that, {ctx.author.mention}")
         
 @client.command(pass_context=True)
 async def mcc(ctx, chname1 : str, chname2 : str, *arg) -> None:
     ''' "Move-Channel-to-Channel" : .mcc (CHANNEL 1) (CHANNEL 2) [roles to move] -  Moves everyone from Channel 1 to Channel 2. If roles are included, only users with the specified roles will be moved '''
     if permission_to_move(ctx.message.author):
-        server = ctx.message.server
+        server = ctx.message.guild
         ch1 = get_channel(server, chname1)
         ch2 = get_channel(server, chname2)
         if arg == ():
             if(ch1 == None and ch2 != None):
-                await client.say("Sorry, '" + chname1 + "' could not be found.")
+                await ctx.send("Sorry, '" + chname1 + "' could not be found.")
             elif(ch2 == None and ch1 != None):
-                await client.say("Sorry, '" + chname2 + "' could not be found.")
+                await ctx.send("Sorry, '" + chname2 + "' could not be found.")
             elif(ch2 == None and ch1 == None):
-                await client.say("Sorry, both '" + chname1 + "' and  '" + chname2 + "' could not be found.")
+                await ctx.send("Sorry, both '" + chname1 + "' and  '" + chname2 + "' could not be found.")
             else:
-                lst = [client.move_member(member, ch2) for member in ch1.voice_members]
+                lst = [member.move_to(ch2) for member in ch1.members]
                 await asyncio.gather(*lst)
         else:
             for role in arg:
                 await mbr_helper(server, role, ch1, ch2)
     else:
-        await client.say("Sorry you don't have permissions for that.")
-    #await client.delete_message(ctx.message)
+        await ctx.send(f"Sorry you don't have permissions for that, {ctx.author.mention}")
+    #await ctx.message.delete()
     
 
-                    
 @client.command(pass_context=True)
 async def mbr(ctx, role : str, chname : str) -> None:
     ''' "Move-By-Role" : .mbr (ROLE_NAME) (CHANNEL x) -  Moves everyone from with ROLE_NAME in one of their roles to CHANNEL x '''
     if permission_to_move(ctx.message.author):
-        server = ctx.message.server
+        server = ctx.message.guild
         ch = get_channel(server, chname)
         got_role = get_role(server, role)
         all_members = server.members
                 
         if(ch == None and got_role == None):
-            await client.say("Sorry, both '" + chname + "' and '" + role + "' could not be found.")
+            await ctx.send("Sorry, both '" + chname + "' and '" + role + "' could not be found.")
         elif(ch == None):
-            await client.say("Sorry, '" + chname + "' could not be found.")
+            await ctx.send("Sorry, '" + chname + "' could not be found.")
         elif(got_role == None):
-            await client.say("Sorry, '" + role + "' could not be found.")
+            await ctx.send("Sorry, '" + role + "' could not be found.")
         for member in all_members:
-            if(member.voice_channel != None and member.voice_channel != ch and not member.is_afk):
+            if(member.voice != None and member.voice.channel != ch and not member.voice.afk):
                 for rolee in member.roles:
                     if rolee == got_role:
-                        await client.move_member(member, ch)
-                        #await client.say("Moved Member: " + member.name + " with role " + got_role.name + " to channel " + ch.name)
+                        await member.move_to(ch)
+                        #await ctx.send("Moved Member: " + member.name + " with role " + got_role.name + " to channel " + ch.name)
     else:
-        await client.say("Sorry you don't have permissions for that.")
-    await client.delete_message(ctx.message)
+        await ctx.send(f"Sorry you don't have permissions for that, {ctx.author.mention}")
+    await ctx.message.delete()
 
 ######################################## END OF MASS_MOVE FUNCTIONS ############################################
 ######################################## END OF MASS_MOVE FUNCTIONS ############################################        
@@ -164,17 +176,26 @@ async def mbr(ctx, role : str, chname : str) -> None:
 @client.event
 async def on_reaction_add(reaction, user):
     if user != client.user:
-        if(user.server_permissions.manage_messages and reaction.message.channel == control_panel and reaction.emoji == mm_reaction_emoji_1):
+        if(permission_to_move(user) and reaction.message.channel == control_panel and reaction.emoji == mm_reaction_emoji_1):
             global voice_channels
-            ch1 = voice_channels[reaction.message.embeds[0]['title'].strip('*')]
-            next_reaction, user = await client.wait_for_reaction(emoji = mm_reaction_emoji_2, user=user) #if person uses emoji on an unintended message, function breaks
-            ch2 = voice_channels[next_reaction.message.embeds[0]['title'].strip('*')]
-            lst = {client.move_member(member, ch2) for member in ch1.voice_members}
+            #ch1 = voice_channels[reaction.message.embeds[0].title.strip('*')]
+            server = main_server
+            ch1 = client.get_channel(message_to_channel[reaction.message.id])
+            
+            def check(r,u):
+                return r.emoji == mm_reaction_emoji_2 and u == user
+                
+            next_reaction, _ = await client.wait_for('reaction_add', check = check) #if person uses emoji on an unintended message, function breaks
+            #ch2 = voice_channels[next_reaction.message.embeds[0].title.strip('*')]
+            ch2 = client.get_channel(message_to_channel[next_reaction.message.id])
+            
+            lst = [member.move_to(ch2) for member in ch1.members]
+            for member in ch1.members:
+                await member.move_to(ch2)
             print("{}/{} moved everyone from {} to {}".format(user.display_name, user.name, ch1.name, ch2.name))
             await asyncio.gather(*lst)
-            await client.remove_reaction(reaction.message, mm_reaction_emoji_1, user)
-            await client.remove_reaction(next_reaction.message, mm_reaction_emoji_2, user)
-            return
+            await reaction.message.remove_reaction(mm_reaction_emoji_1, user)
+            await next_reaction.message.remove_reaction(mm_reaction_emoji_2, user)
             
             
             
@@ -183,15 +204,18 @@ async def lib(ctx, url):
     #url = 'src\\' + url
     url = url.lower()
     if url != 'list':
-        channel = ctx.message.author.voice.voice_channel
-        server = ctx.message.server
-        if client.voice_client_in(server) == None:
-            await client.join_voice_channel(channel)
-        voice_client = client.voice_client_in(server)
-        player = voice_client.create_ffmpeg_player(filename = f'sounds\\{url}.mp3')
-        player.start()
+        channel = ctx.message.author.voice.channel
+        server = ctx.message.guild
+        if server.voice_client == None:
+            await channel.connect()
+        audio_source = discord.FFmpegPCMAudio(f'Ω{url}.mp3')
+        server.voice_client.play(audio_source)
     else:
-        await client.say("MP3 Name List: bencry, benko, noi, sfcl, money, zackstop, chillis, mskeisha, aknife, achild, kyle, wednesday, lebronjames, notmydad, eggsma, roadwork, delicioso, online, skate, cowboy, countryboy, oovoo, chickens, okay")
+        mypath = "./"
+        sounds = [f[1:-4] for f in listdir(mypath) if isfile(join(mypath, f)) and f[-3:] == "mp3"]
+            
+        await ctx.send(f"MP3 Name List: {', '.join(sounds)}")
 
 #Run bot
+client.add_cog(Music(client))
 client.run(TOKEN)

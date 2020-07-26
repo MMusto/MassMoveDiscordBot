@@ -26,11 +26,11 @@ async def mbr_helper(server, role : str, ch1, ch2) -> "None":
     elif(got_role == None):
         await client.say("Sorry, '" + role + "' could not be found.")
 
-    all_members = ch1.voice_members
+    all_members = ch1.members
     for member in all_members:
         for rolee in member.roles:
             if rolee == got_role:
-                await client.move_member(member, ch2)
+                await member.move_to(ch2)
 
 def get_role(server, role : str) -> 'Role':
     '''Helper function that returns Role object from name snippet'''
@@ -40,7 +40,7 @@ def get_role(server, role : str) -> 'Role':
     return None
 
 def permission_to_move(user):
-	return user.server_permissions.move_members;
+	return user.guild_permissions.move_members;
                     
 ######################################## END OF HELPER FUNCTIONS ############################################
 ######################################## END OF HELPER FUNCTIONS ############################################
