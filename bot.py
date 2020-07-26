@@ -115,7 +115,7 @@ async def mah(ctx) -> None:
         for member in all_members:
             if(member.voice and not member.voice.afk and member != author):
                 await member.move_to(move_channel)
-        await ctx.send("Mass moved everyone to " + str(move_channel))
+        await ctx.send(f"Mass moved everyone to {str(move_channel)}")
         await ctx.message.delete()
     else:
         await ctx.send(f"Sorry you don't have permissions for that, {ctx.author.mention}")
@@ -129,11 +129,11 @@ async def mcc(ctx, chname1 : str, chname2 : str, *arg) -> None:
         ch2 = get_channel(server, chname2)
         if arg == ():
             if(ch1 == None and ch2 != None):
-                await ctx.send("Sorry, '" + chname1 + "' could not be found.")
+                await ctx.send(f"Sorry, '{chname1}' could not be found.")
             elif(ch2 == None and ch1 != None):
-                await ctx.send("Sorry, '" + chname2 + "' could not be found.")
+                await ctx.send(f"Sorry, '{chname2}' could not be found.")
             elif(ch2 == None and ch1 == None):
-                await ctx.send("Sorry, both '" + chname1 + "' and  '" + chname2 + "' could not be found.")
+                await ctx.send(f"Sorry, both '{chname1}' and  '{chname2}' could not be found.")
             else:
                 lst = [member.move_to(ch2) for member in ch1.members]
                 await asyncio.gather(*lst)
