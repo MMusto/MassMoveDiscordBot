@@ -193,9 +193,9 @@ async def on_reaction_add(reaction, user):
             for member in ch1.members:
                 await member.move_to(ch2)
             print("{}/{} moved everyone from {} to {}".format(user.display_name, user.name, ch1.name, ch2.name))
-            await asyncio.gather(*lst)
             await reaction.message.remove_reaction(mm_reaction_emoji_1, user)
             await next_reaction.message.remove_reaction(mm_reaction_emoji_2, user)
+            await asyncio.gather(*lst)
             
             
             
