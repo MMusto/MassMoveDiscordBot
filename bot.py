@@ -68,14 +68,14 @@ async def start_mass_move_reactions():
 		
     await control_panel.purge(limit=100)
     #await client.send_message(control_panel, channel_sep)
-    for channel in sorted(voice_channels.keys(), key = lambda x: voice_channels[x].position):
+    for channel in sorted(voice_channels.keys(), key = lambda channel_name: voice_channels[channel_name].position):
         name = "**"+channel+"**"
         message = await control_panel.send(embed = discord.Embed(title = name))
         await message.add_reaction( mm_reaction_emoji_1)
         await message.add_reaction( mm_reaction_emoji_2)
         message_to_channel[message.id] = voice_channels[channel].id
         #await client.send_message(control_panel, channel_sep)
-    await control_panel.send( "**Click the " + mm_reaction_emoji_1 + " emoji underneath the channel you wish to move everyone from. Then click the " + mm_reaction_emoji_2 + " emoji underneath the channel you wish to move everyone to.**")
+    await control_panel.send( f"**Click the {mm_reaction_emoji_1} emoji underneath the channel you wish to move everyone from. Then click the {mm_reaction_emoji_2} emoji underneath the channel you wish to move everyone to.**")
    
 @client.command(pass_context=True)
 async def rr(ctx):
@@ -155,11 +155,11 @@ async def mbr(ctx, role : str, chname : str) -> None:
         all_members = server.members
                 
         if(ch == None and got_role == None):
-            await ctx.send("Sorry, both '" + chname + "' and '" + role + "' could not be found.")
+            await ctx.send(f"Sorry, both '{chname}' and '{role}' could not be found.")
         elif(ch == None):
-            await ctx.send("Sorry, '" + chname + "' could not be found.")
+            await ctx.send(f"Sorry, '{chname}' could not be found.")
         elif(got_role == None):
-            await ctx.send("Sorry, '" + role + "' could not be found.")
+            await ctx.send(f"Sorry, '{role}' could not be found.")
         for member in all_members:
             if(member.voice != None and member.voice.channel != ch and not member.voice.afk):
                 for rolee in member.roles:
@@ -176,16 +176,15 @@ async def mbr(ctx, role : str, chname : str) -> None:
 @client.event
 async def on_reaction_add(reaction, user):
     if user != client.user:
-        if(permission_to_move(user) and reaction.message.channel == control_panel and reaction.emoji == mm_reaction_emoji_1):
+        if(permission_to_move(user) and reaction.message.channel == control_panel and reaction.emoji == mm_reaction_emoji_1 and reaction.message.id in message_to_channel):
             global voice_channels
             #ch1 = voice_channels[reaction.message.embeds[0].title.strip('*')]
-            server = main_server
             ch1 = client.get_channel(message_to_channel[reaction.message.id])
             
             def check(r,u):
                 return r.emoji == mm_reaction_emoji_2 and u == user and r.message.id in message_to_channel
                 
-            next_reaction, _ = await client.wait_for('reaction_add', check = check) #if person uses emoji on an unintended message, function breaks
+            next_reaction, _ = await client.wait_for('reaction_add', check = check)
             #ch2 = voice_channels[next_reaction.message.embeds[0].title.strip('*')]
             ch2 = client.get_channel(message_to_channel[next_reaction.message.id])
             
@@ -200,7 +199,6 @@ async def on_reaction_add(reaction, user):
 
 @client.command(pass_context=True)
 async def lib(ctx, url):
-    #url = 'src\\' + url
     url = url.lower()
     if url != 'list':
         channel = ctx.message.author.voice.channel
