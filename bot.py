@@ -216,6 +216,7 @@ async def lib(ctx, url):
             print(error)
             play_finished = True
         server.voice_client.play(audio_source, after = dc_bot)
+        #TODO: implement with threading to avoid wasted CPU idle time
         while ( not play_finished ):
             pass
         await server.voice_client.disconnect()
