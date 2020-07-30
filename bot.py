@@ -200,18 +200,22 @@ async def on_reaction_add(reaction, user):
 @client.command(pass_context=True)
 async def lib(ctx, url):
     url = url.lower()
-    if url != 'list':
+    mypath = "./"
+    sounds = [f[1:-4] for f in listdir(mypath) if isfile(join(mypath, f)) and f[-3:] == "mp3"]
+    mp3_file = f'Ω{url}.mp3'
+    
+    if url in sounds:
         channel = ctx.message.author.voice.channel
         server = ctx.message.guild
         if server.voice_client == None:
             await channel.connect()
-        audio_source = discord.FFmpegPCMAudio(f'Ω{url}.mp3')
+        audio_source = discord.FFmpegPCMAudio(mp3_file)
         server.voice_client.play(audio_source)
-    else:
-        mypath = "./"
-        sounds = [f[1:-4] for f in listdir(mypath) if isfile(join(mypath, f)) and f[-3:] == "mp3"]
-            
+        await server.voice_client.disconnect()
+    elif url == "list":
         await ctx.send(f"MP3 Name List: {', '.join(sounds)}")
+    else:
+        await ctx.send(f"Sorry {ctx.author.mention}, I couldn't find the MP3 file called '{url}'.")
 
 #Run bot
 client.add_cog(Music(client))
