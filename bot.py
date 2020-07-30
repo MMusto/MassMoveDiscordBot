@@ -210,8 +210,10 @@ async def lib(ctx, url):
         if server.voice_client == None:
             await channel.connect()
         audio_source = discord.FFmpegPCMAudio(mp3_file)
-        server.voice_client.play(audio_source)
-        await server.voice_client.disconnect()
+        async def dc_bot(error):
+            print(error)
+            await server.voice_client.disconnect()
+        server.voice_client.play(audio_source after = dc_bot)
     elif url == "list":
         await ctx.send(f"MP3 Name List: {', '.join(sounds)}")
     else:
