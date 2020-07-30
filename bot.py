@@ -213,7 +213,7 @@ async def lib(ctx, url):
         async def dc_bot(error):
             print(error)
             await server.voice_client.disconnect()
-        server.voice_client.play(audio_source, after = dc_bot)
+        await server.voice_client.play(audio_source, after = dc_bot)
     elif url == "list":
         await ctx.send(f"MP3 Name List: {', '.join(sounds)}")
     else:
