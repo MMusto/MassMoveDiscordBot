@@ -6,7 +6,7 @@ import youtube_dl
 import discord
 from discord import opus
 from helper import *
-from musicplayer  import *
+#from musicplayer  import *
 import asyncio
 import utility
 
@@ -218,7 +218,7 @@ async def lib(ctx, url):
         if server.voice_client == None:
             await channel.connect()
         audio_source = discord.FFmpegPCMAudio(mp3_file)
-        server.voice_client.play(audio_source)
+        server.voice_client.play(audio_source, after = dc_bot)
         
     elif url == "list":
         await ctx.send(f"MP3 Name List: {', '.join(sounds)}")
@@ -226,5 +226,5 @@ async def lib(ctx, url):
         await ctx.send(f"Sorry {ctx.author.mention}, I couldn't find the MP3 file called '{url}'.")
 
 #Run bot
-client.add_cog(Music(client))
+#client.add_cog(Music(client))
 client.run(TOKEN)
