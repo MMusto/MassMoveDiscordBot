@@ -200,7 +200,7 @@ async def on_reaction_add(reaction, user):
 #https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-pass-a-coroutine-to-the-player-s-after-function
 def dc_bot(error):
     try:
-        fut = asyncio.run_coroutine_threadsafe(server.voice_client.disconnect(), client.loop)
+        fut = asyncio.run_coroutine_threadsafe(main_server.voice_client.disconnect(), client.loop)
         fut.result()
     except Exception as e:
         print(e)
