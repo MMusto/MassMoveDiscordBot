@@ -197,6 +197,14 @@ async def on_reaction_add(reaction, user):
             await asyncio.gather(*lst)
             
 
+#https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-pass-a-coroutine-to-the-player-s-after-function
+def dc_bot(error):
+    try:
+        fut = asyncio.run_coroutine_threadsafe(server.voice_client.disconnect(), client.loop)
+        fut.result()
+    except Exception as e:
+        print(e)
+
 @client.command(pass_context=True)
 async def lib(ctx, url):
     url = url.lower()
@@ -210,18 +218,7 @@ async def lib(ctx, url):
         if server.voice_client == None:
             await channel.connect()
         audio_source = discord.FFmpegPCMAudio(mp3_file)
-        
-        #https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-pass-a-coroutine-to-the-player-s-after-function
-        def dc_bot(error):
-            coro = server.voice_client.disconnect()
-            fut = asyncio.run_coroutine_threadsafe(coro, client.loop)
-            try:
-                fut.result()
-            except:
-                # an error happened sending the message
-                pass
         server.voice_client.play(audio_source, after = dc_bot)
-        #TODO: implement with threading to avoid wasted CPU idle time
         
     elif url == "list":
         await ctx.send(f"MP3 Name List: {', '.join(sounds)}")
