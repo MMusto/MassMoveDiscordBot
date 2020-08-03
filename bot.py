@@ -10,9 +10,6 @@ from helper import *
 import asyncio
 import utility
 
-import sys
-print(sys.version)
-
 #Documentation used: https://discordpy.readthedocs.io/en/async/api.html
 
 #Token is stored in Heroku environment to avoid 
@@ -144,7 +141,6 @@ async def mcc(ctx, chname1 : str, chname2 : str, *arg) -> None:
         await ctx.send(f"Sorry you don't have permissions for that, {ctx.author.mention}")
     #await ctx.message.delete()
     
-
 @client.command(pass_context=True)
 async def mbr(ctx, role : str, chname : str) -> None:
     ''' "Move-By-Role" : .mbr (ROLE_NAME) (CHANNEL x) -  Moves everyone from with ROLE_NAME in one of their roles to CHANNEL x '''
@@ -197,6 +193,13 @@ async def on_reaction_add(reaction, user):
             await asyncio.gather(*lst)
             
 
+
+
+@client.command(pass_context=True)
+async def leave(ctx):
+    if server.voice_client:
+        ctx.message.guild.voice_client.disconnect()
+
 #https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-pass-a-coroutine-to-the-player-s-after-function
 def dc_bot(error):
     try:
@@ -218,7 +221,7 @@ async def lib(ctx, url):
         if server.voice_client == None:
             await channel.connect()
         audio_source = discord.FFmpegPCMAudio(mp3_file)
-        server.voice_client.play(audio_source, after = dc_bot)
+        server.voice_client.play(audio_source)
         
     elif url == "list":
         await ctx.send(f"MP3 Name List: {', '.join(sounds)}")
