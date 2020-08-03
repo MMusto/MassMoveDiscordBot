@@ -1,5 +1,6 @@
 from client import client as client
 import asyncio
+from helper import *
 
 @client.command(pass_context=True)
 async def clear(ctx,lim=1) -> None:
@@ -16,5 +17,5 @@ async def clear(ctx,lim=1) -> None:
 @client.command(pass_context = True)
 async def setgame(ctx, gam):
     '''Modify game played by bot in friends list/status bar'''
-    if ctx.message.author.server_permissions.move_members:
+    if permission_to_move(ctx.message.author):
         await client.change_presence(game=discord.Game(name=gam))
