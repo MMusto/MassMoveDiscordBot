@@ -213,11 +213,11 @@ async def lib(ctx, url):
     url = url.lower()
     mypath = "./"
     sounds = [f[1:-4] for f in listdir(mypath) if isfile(join(mypath, f)) and f[-3:] == "mp3"]
-    mp3_file = f'Ω{url}.mp3'
     
     if url in sounds:
         channel = ctx.message.author.voice.channel
         server = ctx.message.guild
+        mp3_file = f'Ω{url}.mp3'
         if server.voice_client == None:
             await channel.connect()
         audio_source = discord.FFmpegPCMAudio(mp3_file)
