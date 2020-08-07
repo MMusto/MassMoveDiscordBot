@@ -195,10 +195,10 @@ async def on_reaction_add(reaction, user):
 
 
 
-@client.command(pass_context=True)
-async def leave(ctx):
-    if permission_to_move(ctx.message.author) and ctx.message.guild.voice_client:
-        await ctx.message.guild.voice_client.disconnect(force = True)
+# @client.command(pass_context=True)
+# async def leave(ctx):
+    # if permission_to_move(ctx.message.author) and ctx.message.guild.voice_client:
+        # await ctx.message.guild.voice_client.disconnect(force = True)
 
 #https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-pass-a-coroutine-to-the-player-s-after-function
 def dc_bot(error):
