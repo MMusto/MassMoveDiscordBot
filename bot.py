@@ -192,9 +192,6 @@ async def on_reaction_add(reaction, user):
             await next_reaction.message.remove_reaction(mm_reaction_emoji_2, user)
             await asyncio.gather(*lst)
             
-
-
-
 # @client.command(pass_context=True)
 # async def leave(ctx):
     # if permission_to_move(ctx.message.author) and ctx.message.guild.voice_client:
