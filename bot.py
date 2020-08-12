@@ -17,7 +17,6 @@ import utility
 TOKEN = os.environ["TOKEN"]
 
 control_panel = None
-voice_channels = {}
 message_to_channel = {}
 mm_reaction_emoji_1 = '🔼'
 mm_reaction_emoji_2 = '🔵'
@@ -39,7 +38,6 @@ async def on_ready():
 async def start_mass_move_reactions():
     '''Init mass move'''
     global control_panel
-    global voice_channels
     global main_server
     
     exe = None
@@ -52,6 +50,7 @@ async def start_mass_move_reactions():
         error(f"{server_name} not found in function 'start_mass_move_reactions'")
         return
    
+    voice_channels = {}
     channels = await exe.fetch_channels()
     for channel in channels:
         if type(channel) is discord.channel.VoiceChannel:
@@ -173,20 +172,15 @@ async def mbr(ctx, role : str, chname : str) -> None:
 async def on_reaction_add(reaction, user):
     if user != client.user:
         if(permission_to_move(user) and reaction.message.channel == control_panel and reaction.emoji == mm_reaction_emoji_1 and reaction.message.id in message_to_channel):
-            global voice_channels
-            #ch1 = voice_channels[reaction.message.embeds[0].title.strip('*')]
             ch1 = client.get_channel(message_to_channel[reaction.message.id])
             
             def check(r,u):
                 return r.emoji == mm_reaction_emoji_2 and u == user and r.message.id in message_to_channel
                 
             next_reaction, _ = await client.wait_for('reaction_add', check = check)
-            #ch2 = voice_channels[next_reaction.message.embeds[0].title.strip('*')]
             ch2 = client.get_channel(message_to_channel[next_reaction.message.id])
             
             lst = [member.move_to(ch2) for member in ch1.members]
-            # for member in ch1.members:
-                # await member.move_to(ch2)
             print("{}/{} moved everyone from {} to {}".format(user.display_name, user.name, ch1.name, ch2.name))
             await reaction.message.remove_reaction(mm_reaction_emoji_1, user)
             await next_reaction.message.remove_reaction(mm_reaction_emoji_2, user)
