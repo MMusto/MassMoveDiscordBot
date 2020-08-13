@@ -79,7 +79,8 @@ class Search(commands.Cog):
         for item in list:
             embed.add_field(name=item.name, value = f"Buy: **{item.buy}**  ||  Sell: **{item.sell}**", inline = False)
         if list:
-            return await ctx.send(embed=embed, delete_after= 20.0)
+            ##return await ctx.send(embed=embed, delete_after= 20.0)
+            return await ctx.send(embed=embed)
         return None
     
     async def delete_countdown(self, ctx, delay):
@@ -92,7 +93,7 @@ class Search(commands.Cog):
             new_embed = delete_msg.embeds[0].set_footer(text = f"Deleting query in {delay} seconds")
             await delete_msg.edit(embed = new_embed)
         await delete_msg.edit(delete_after=0.0)
-        await ctx.message.edit(delete_after=0.0)
+        #await ctx.message.edit(delete_after=0.0)
         
     async def output_results(self, *args, ctx):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
@@ -107,7 +108,7 @@ class Search(commands.Cog):
             await ctx.send(f"Sorry {ctx.author.mention}, we got nothin'")
         else:
             #delete_msg = await ctx.send(f"Deleting query in {3} seconds")
-            self.bot.loop.create_task(self.delete_countdown(ctx, 15))
+            #self.bot.loop.create_task(self.delete_countdown(ctx, 15))
         
     @commands.command()
     async def price(self, ctx, *args):
