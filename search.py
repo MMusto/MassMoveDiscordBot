@@ -90,7 +90,7 @@ class Search(commands.Cog):
         delete_msg = ctx.send(f"Deleting query in {delay} seconds")
         for i in range(delay):
             delay -= 1
-            delete_msg.edit(f"Deleting query in {delay} seconds")
+            await delete_msg.edit(f"Deleting query in {delay} seconds")
             await asyncio.sleep(1)
         msgs_to_delete.append(delete_msg)
         await ctx.channel.delete_message(msgs_to_delete)
