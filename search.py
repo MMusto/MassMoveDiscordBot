@@ -77,14 +77,23 @@ class Search(commands.Cog):
         for item in list:
             embed.add_field(name=item.name, value = f"Buy: **{item.buy}**  ||  Sell: **{item.sell}**", inline = False)
         msg = await ctx.send(embed=embed)
-        await asyncio.sleep(15)
-        await client.delete_message(msg)
 
     async def output_results(self, *args, ctx):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
+        msgs_to_delete = []
         for trader, results in zip(traders, args):
             if results:
-                await self.print_list(trader, results, ctx)
+                msg = await self.print_list(trader, results, ctx)
+                msgs_to_delete.append(msg)
+        #could just use message.delete(delay)
+        delay = 15
+        delete_msg = ctx.send(f"Deleting query in {delay} seconds")
+        for i in range(len(delay)):
+            delay -= 1
+            delay_msg.edit(f"Deleting query in {delay} seconds")
+            await asyncio.sleep(1)
+        msgs_to_delete.append(delay_msg)
+        await ctx.channel.delete_message(msgs_to_delete)
         
     @commands.command()
     async def price(self, ctx, *args):
