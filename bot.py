@@ -9,6 +9,7 @@ from helper import *
 from musicplayer  import *
 import asyncio
 import utility
+from search import Search
 
 #Documentation used: https://discordpy.readthedocs.io/en/async/api.html
 
@@ -39,7 +40,7 @@ async def start_mass_move_reactions():
     '''Init mass move'''
     global control_panel
     global main_server
-    
+ 
     exe = None
     async for server in client.fetch_guilds():
         if server_name in server.name.lower():
@@ -217,7 +218,8 @@ async def lib(ctx, url):
         await ctx.send(f"MP3 Name List: {', '.join(sounds)}")
     else:
         await ctx.send(f"Sorry {ctx.author.mention}, I couldn't find the MP3 file called '{url}'.")
-
+        
+client.add_cog(Search(client))
 #Run bot
 client.add_cog(Music(client))
 client.run(TOKEN)

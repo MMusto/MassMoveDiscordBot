@@ -3,3 +3,5 @@ git+https://github.com/rg3/youtube-dl#egg=youtube_dl
 asyncio
 PyNaCl
 aiohttp>=3.6.0,<3.7.0
+pandas
+pickle
