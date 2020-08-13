@@ -72,9 +72,9 @@ class Search(commands.Cog):
         return (basic_items, black_items, hightier_items, drug_items)
         
     async def print_list(self, trader, list, ctx):
-        embed = discord.Embed(title= f"**{trader}**")
+        embed = discord.Embed(title= f"**{trader}**", color=0x09dee1)
         for item in list:
-            embed.add_field(name=item.name, value = f"Buy: **{item.buy}**  ||  Sell: **{item.sell}**", inline = False, color=0x09dee1)
+            embed.add_field(name=item.name, value = f"Buy: **{item.buy}**  ||  Sell: **{item.sell}**", inline = False)
         await ctx.send(embed=embed)
 
     async def output_results(self, *args, ctx):
