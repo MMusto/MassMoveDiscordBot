@@ -74,7 +74,7 @@ class Search(commands.Cog):
     async def print_list(self, trader, list, ctx):
         embed = discord.Embed(title= f"**{trader}**")
         for item in list:
-            embed.add_field(name=item.name, value = "Buy Price = {0:^10} | Sell Price = {1:^10}".format(item.buy, item.sell ), inline = False)
+            embed.add_field(name=item.name, value = f"Buy: **{item.buy}**  ||  Sell: **{item.sell}**", inline = False, color=0x09dee1)
         await ctx.send(embed=embed)
 
     async def output_results(self, *args, ctx):
@@ -86,4 +86,4 @@ class Search(commands.Cog):
     @commands.command()
     async def price(self, ctx, *args):
         name = " ".join(args)
-        await self.output_results(*self.search_traders(name), ctx=ctx)
+        await self.output_results(*self.search_traders(name.lower().strip()), ctx=ctx)
