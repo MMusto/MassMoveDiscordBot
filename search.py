@@ -3,6 +3,9 @@ from item import Item
 import os
 import pickle
 
+import discord
+from discord.ext import commands
+
 class Search(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
