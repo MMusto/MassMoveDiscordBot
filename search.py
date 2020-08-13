@@ -71,30 +71,20 @@ class Search(commands.Cog):
         
         return (basic_items, black_items, hightier_items, drug_items)
         
-    def print_list(self, trader, list):
-        print_str = "\n"
-        print_str += "-"*80
-        print_str += "\n{0:^77}\n".format(trader)
+    async def print_list(self, trader, list, ctx):
+        await ctx.send("-"*82)
+        await ctx.send("{0:^77} \n".format(trader))
         for item in list:
-            print_str += "{0:^30} | Buy Price = {1:^10} | Sell Price = {2:^10}\n".format( item.name, item.buy, item.sell )
-        print_str += "-"*80
-        print_str += "\n"
-        return print_str
+            await ctx.send("{0:^30} | Buy Price = {1:^10} | Sell Price = {2:^10}".format( item.name, item.buy, item.sell ))
+        await ctx.send("-"*82)
 
-    def output_results(self, *args):
+    async def output_results(self, *args, ctx):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
-        print_str = ""
         for trader, results in zip(traders, args):
             if results:
-                print_str += self.print_list(trader, results)
-        return print_str
+                await print_list(trader, results)
         
     @commands.command()
     async def price(self, ctx, *args):
         name = " ".join(args)
-        msg = self.output_results(*self.search_traders(name))
-        if msg:
-            await ctx.send(msg)
-        else:
-            await ctx.send("Sorry, couldn't find that item.")
-    
+        await self.output_results(*self.search_traders(name), ctx)
