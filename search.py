@@ -23,6 +23,8 @@ class Search(commands.Cog):
                             Item(name = "White Candy", sell = 5_000),
                             Item(name = "Beige Candy", sell = 2_500)
                           ]
+                            
+        self.ids = (140976154512326656, 182639405159153664, 275667331009478667)
 
     def get_items(self, sheet_name):
         df = self.get_dataframe(sheet_name)
@@ -53,7 +55,7 @@ class Search(commands.Cog):
                 
                 # if pd.notna(buy) and pd.notna(sell):
                 name = df.at[row, col]
-                if type(name) is str and not(pd.isna(buy) and pd.isna(sell)):
+                if type(name) is str and not(pd.isna(buy) and pd.isna(sell)) and not name.startswith("Info"):
                     items.append(Item(name, buy, sell))
 
         return items
@@ -83,7 +85,7 @@ class Search(commands.Cog):
             try:
                 return await ctx.send(embed=embed)
             except:
-                await ctx.send(f"Sorry {ctx.author.mention}, try being more specific.")
+                return None
         return None
     
     async def delete_countdown(self, ctx, delay):
@@ -99,7 +101,7 @@ class Search(commands.Cog):
         #await ctx.message.edit(delete_after=0.0)
         
     async def output_results(self, *args, ctx):
-        traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
+        traders = ("Green Mountain / Green Forest", "Altar Black Market", "High Tier Military Trader", "Drugs Trader")
         msgs_sent = []
         for trader, results in zip(traders, args):
             if results:
@@ -108,16 +110,23 @@ class Search(commands.Cog):
                     msgs_sent.append(msg)
         #could just use message.delete(delay)
         if msgs_sent == []:
-            await ctx.send(f"Sorry {ctx.author.mention}, we got nothin'")
+            await ctx.send(f"Sorry {ctx.author.mention}, I couldn't find anything.")
         else:
             pass
             #self.bot.loop.create_task(self.delete_countdown(ctx, 15))
         
-    @commands.command()
+    @commands.command(aliases=['p', 'search', 'cost'])
     async def price(self, ctx, *args):
+        """Quickly get trader prices."""
         name = " ".join(args)
         if len(args) > 0:
-            await self.output_results(*self.search_traders(name.lower().strip()), ctx=ctx)
+            await self.output_results(*self.search_traders(name.lower().strip()), ctx=ctx)   
+            
+    @commands.command()
+    async def dfm(self, ctx):
+        """Send a warning message that the bot's going offline."""
+        if ctx.message.author.id in self.ids:
+            await ctx.send("I'm going down for maintenance. Be back soon!")
         
     # @commands.command()
     # async def test(self, ctx):
