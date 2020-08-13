@@ -81,7 +81,7 @@ class Search(commands.Cog):
         print_str += "\n"
         return print_str
 
-    async def output_results(self, *args):
+    def output_results(self, *args):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
         print_str = ""
         for trader, results in zip(traders, args):
@@ -92,5 +92,5 @@ class Search(commands.Cog):
     @commands.command()
     async def price(self, ctx, *args):
         name = " ".join(args)
-        msg = await self.output_results(*self.search_traders(name))
-        ctx.send(print_str)
+        msg = self.output_results(*self.search_traders(name))
+        await ctx.send(msg)
