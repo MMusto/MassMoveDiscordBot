@@ -103,7 +103,7 @@ class Search(commands.Cog):
                 if msg:
                     msgs_sent.append(msg)
         #could just use message.delete(delay)
-        if msgs_sent = []:
+        if msgs_sent == []:
             await ctx.send(f"Sorry {ctx.author.mention}, we got nothin'")
         else:
             #delete_msg = await ctx.send(f"Deleting query in {3} seconds")
