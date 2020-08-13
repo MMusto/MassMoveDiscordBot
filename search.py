@@ -93,7 +93,7 @@ class Search(commands.Cog):
             await delete_msg.edit(content = f"Deleting query in {delay} seconds")
             await asyncio.sleep(1)
         msgs_to_delete.append(delete_msg)
-        await ctx.channel.delete_message(msgs_to_delete)
+        await ctx.channel.delete_messages(msgs_to_delete)
         
     @commands.command()
     async def price(self, ctx, *args):
