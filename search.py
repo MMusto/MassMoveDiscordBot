@@ -2,6 +2,7 @@ import pandas as pd
 from item import Item
 import os
 import pickle
+import asyncio
 
 import discord
 from discord.ext import commands
@@ -75,7 +76,9 @@ class Search(commands.Cog):
         embed = discord.Embed(title= f"**{trader}**", color=0x09dee1)
         for item in list:
             embed.add_field(name=item.name, value = f"Buy: **{item.buy}**  ||  Sell: **{item.sell}**", inline = False)
-        await ctx.send(embed=embed)
+        msg = await ctx.send(embed=embed)
+        await asyncio.sleep(15)
+        await client.delete_message(msg)
 
     async def output_results(self, *args, ctx):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
