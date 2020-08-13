@@ -11,7 +11,7 @@ import asyncio
 import utility
 from search import Search
 
-#Documentation used: https://discordpy.readthedocs.io/en/async/api.html
+#Documentation used: https://discordpy.readthedocs.io/en/latest/api.html
 
 #Token is stored in Heroku environment to avoid 
 #the vulnerability of private Discord bot key exposed to public

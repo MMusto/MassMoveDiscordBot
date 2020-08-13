@@ -72,11 +72,14 @@ class Search(commands.Cog):
         return (basic_items, black_items, hightier_items, drug_items)
         
     async def print_list(self, trader, list, ctx):
-        await ctx.send("-"*82)
-        await ctx.send("{0:^77} \n".format(trader))
+    
+		#await ctx.message.delete()
+		embed = discord.Embed(title= f"**{trader}**")
+        
         for item in list:
-            await ctx.send("{0:^30} | Buy Price = {1:^10} | Sell Price = {2:^10}".format( item.name, item.buy, item.sell ))
-        await ctx.send("-"*82)
+            embed.add_field(name=item.name, value = "Buy Price = {0:^10} | Sell Price = {1:^10}".format(item.buy, item.sell ), inline = False)
+			
+		await ctx.send(embed=embed)
 
     async def output_results(self, *args, ctx):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
