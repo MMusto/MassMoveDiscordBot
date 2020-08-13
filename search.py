@@ -76,8 +76,9 @@ class Search(commands.Cog):
         embed = discord.Embed(title= f"**{trader}**", color=0x09dee1)
         for item in list:
             embed.add_field(name=item.name, value = f"Buy: **{item.buy}**  ||  Sell: **{item.sell}**", inline = False)
-        msg = await ctx.send(embed=embed)
-
+        if list:
+            return await ctx.send(embed=embed)
+            
     async def output_results(self, *args, ctx):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
         msgs_to_delete = []
@@ -86,14 +87,17 @@ class Search(commands.Cog):
                 msg = await self.print_list(trader, results, ctx)
                 msgs_to_delete.append(msg)
         #could just use message.delete(delay)
-        delay = 15
-        delete_msg = await ctx.send(f"Deleting query in {delay} seconds")
-        for i in range(delay):
-            delay -= 1
-            await delete_msg.edit(content = f"Deleting query in {delay} seconds")
-            await asyncio.sleep(1)
-        msgs_to_delete.append(delete_msg)
-        await ctx.channel.delete_messages([msg for msg in msgs_to_delete if not None])
+        if not msgs_to_delete:
+            ctx.send(f"Sorry {ctx.author.mention}, couldn't find anything.")
+        else:
+            delay = 15
+            delete_msg = await ctx.send(f"Deleting query in {delay} seconds")
+            for i in range(delay):
+                delay -= 1
+                await delete_msg.edit(content = f"Deleting query in {delay} seconds")
+                await asyncio.sleep(1)
+            msgs_to_delete.append(delete_msg)
+            await ctx.channel.delete_messages([msg for msg in msgs_to_delete if not None])
         
     @commands.command()
     async def price(self, ctx, *args):
