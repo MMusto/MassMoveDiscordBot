@@ -107,7 +107,7 @@ class Search(commands.Cog):
         if msgs_sent == []:
             await ctx.send(f"Sorry {ctx.author.mention}, we got nothin'")
         else:
-            #delete_msg = await ctx.send(f"Deleting query in {3} seconds")
+            pass
             #self.bot.loop.create_task(self.delete_countdown(ctx, 15))
         
     @commands.command()
