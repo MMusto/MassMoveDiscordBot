@@ -55,42 +55,42 @@ class Search(commands.Cog):
 
         return items
         
-def get_dataframe(self, sheet_name):
-    try:
-        df =  pickle.load(open(f"trader_data_{sheet_name}.pickle", "rb"))
-    except:
-        df = pd.read_excel("Trader.xlsx", sheet_name,  usecols="B:C,D,E,G:H,I,J,L:M,N,O,Q:R,S,T")
-        pickle.dump(df, open(f"trader_data_{sheet_name}.pickle", "wb"))
-    return df
+    def get_dataframe(self, sheet_name):
+        try:
+            df =  pickle.load(open(f"trader_data_{sheet_name}.pickle", "rb"))
+        except:
+            df = pd.read_excel("Trader.xlsx", sheet_name,  usecols="B:C,D,E,G:H,I,J,L:M,N,O,Q:R,S,T")
+            pickle.dump(df, open(f"trader_data_{sheet_name}.pickle", "wb"))
+        return df
 
-def search_traders(name):
-    basic_items = [item for item in self.basic_traders_items if name in item.name.lower().strip()]
-    black_items = [item for item in self.black_market_items if name in item.name.lower().strip()]
-    hightier_items = [item for item in self.high_tier_items if name in item.name.lower().strip()]
-    drug_items = [item for item in self.drugs if name.lower() in item.name.lower()]
-    
-    return (basic_items, black_items, hightier_items, drug_items)
-    
-def print_list(trader, list):
-    print_str = "\n"
-    print_str += "-"*82
-    print_str += "{0:^77} \n".format(trader)
-    for item in list:
-        print_str += "{0:^30} | Buy Price = {1:^10} | Sell Price = {2:^10}".format( item.name, item.buy, item.sell )
-    print_str += "-"*82
-    print_str += "\n"
-    return print_str
+    def search_traders(name):
+        basic_items = [item for item in self.basic_traders_items if name in item.name.lower().strip()]
+        black_items = [item for item in self.black_market_items if name in item.name.lower().strip()]
+        hightier_items = [item for item in self.high_tier_items if name in item.name.lower().strip()]
+        drug_items = [item for item in self.drugs if name.lower() in item.name.lower()]
+        
+        return (basic_items, black_items, hightier_items, drug_items)
+        
+    def print_list(trader, list):
+        print_str = "\n"
+        print_str += "-"*82
+        print_str += "{0:^77} \n".format(trader)
+        for item in list:
+            print_str += "{0:^30} | Buy Price = {1:^10} | Sell Price = {2:^10}".format( item.name, item.buy, item.sell )
+        print_str += "-"*82
+        print_str += "\n"
+        return print_str
 
-async def output_results(*args):
-    traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
-    print_str = ""
-    for trader, results in zip(traders, args):
-        if results:
-            print_str += print_list(trader, results)
-    return print_str
-    
-@commands.command()
-async def price(self, ctx, *args):
-    name = " ".join(args)
-    msg = await self.output_results(*self.search_traders(name))
-    ctx.send(print_str)
+    async def output_results(*args):
+        traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
+        print_str = ""
+        for trader, results in zip(traders, args):
+            if results:
+                print_str += print_list(trader, results)
+        return print_str
+        
+    @commands.command()
+    async def price(self, ctx, *args):
+        name = " ".join(args)
+        msg = await self.output_results(*self.search_traders(name))
+        ctx.send(print_str)
