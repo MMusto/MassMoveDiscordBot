@@ -71,14 +71,14 @@ class Search(commands.Cog):
         
         return (basic_items, black_items, hightier_items, drug_items)
         
-    async def print_list(self, trader, list, ctx):
+    async def print_list(self, trader, list, ctx=ctx):
         await ctx.send("-"*82)
         await ctx.send("{0:^77} \n".format(trader))
         for item in list:
             await ctx.send("{0:^30} | Buy Price = {1:^10} | Sell Price = {2:^10}".format( item.name, item.buy, item.sell ))
         await ctx.send("-"*82)
 
-    async def output_results(self, *args, ctx):
+    async def output_results(self, *args, ctx=xtx):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
         for trader, results in zip(traders, args):
             if results:
@@ -87,4 +87,4 @@ class Search(commands.Cog):
     @commands.command()
     async def price(self, ctx, *args):
         name = " ".join(args)
-        await self.output_results(*self.search_traders(name), ctx)
+        await self.output_results(*self.search_traders(name), ctx=ctx)
