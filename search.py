@@ -71,7 +71,7 @@ class Search(commands.Cog):
         
         return (basic_items, black_items, hightier_items, drug_items)
         
-    def print_list(trader, list):
+    def print_list(self, trader, list):
         print_str = "\n"
         print_str += "-"*82
         print_str += "{0:^77} \n".format(trader)
@@ -81,12 +81,12 @@ class Search(commands.Cog):
         print_str += "\n"
         return print_str
 
-    async def output_results(*args):
+    async def output_results(self, *args):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
         print_str = ""
         for trader, results in zip(traders, args):
             if results:
-                print_str += print_list(trader, results)
+                print_str += self.print_list(trader, results)
         return print_str
         
     @commands.command()
