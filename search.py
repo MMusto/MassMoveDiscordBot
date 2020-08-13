@@ -80,7 +80,7 @@ class Search(commands.Cog):
             return await ctx.send(embed=embed)
         return None
     
-    async def delete_query(self, delay, msgs_to_delete):
+    async def delete_query(self, ctx, delay, msgs_to_delete):
         delete_msg = await ctx.send(f"Deleting query in {delay} seconds")
         for i in range(delay):
             delay -= 1
