@@ -73,11 +73,11 @@ class Search(commands.Cog):
         
     def print_list(self, trader, list):
         print_str = "\n"
-        print_str += "-"*82
-        print_str += "{0:^77} \n".format(trader)
+        print_str += "-"*80
+        print_str += "\n{0:^77}\n".format(trader)
         for item in list:
-            print_str += "{0:^30} | Buy Price = {1:^10} | Sell Price = {2:^10}".format( item.name, item.buy, item.sell )
-        print_str += "-"*82
+            print_str += "{0:^30} | Buy Price = {1:^10} | Sell Price = {2:^10}\n".format( item.name, item.buy, item.sell )
+        print_str += "-"*80
         print_str += "\n"
         return print_str
 
