@@ -63,7 +63,7 @@ class Search(commands.Cog):
             pickle.dump(df, open(f"trader_data_{sheet_name}.pickle", "wb"))
         return df
 
-    def search_traders(name):
+    def search_traders(self, name):
         basic_items = [item for item in self.basic_traders_items if name in item.name.lower().strip()]
         black_items = [item for item in self.black_market_items if name in item.name.lower().strip()]
         hightier_items = [item for item in self.high_tier_items if name in item.name.lower().strip()]
