@@ -93,4 +93,8 @@ class Search(commands.Cog):
     async def price(self, ctx, *args):
         name = " ".join(args)
         msg = self.output_results(*self.search_traders(name))
-        await ctx.send(msg)
+        if msg:
+            await ctx.send(msg)
+        else:
+            await ctx.send("Sorry, couldn't find that item.")
+    
