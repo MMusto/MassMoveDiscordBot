@@ -87,7 +87,7 @@ class Search(commands.Cog):
                 msgs_to_delete.append(msg)
         #could just use message.delete(delay)
         delay = 15
-        delete_msg = ctx.send(f"Deleting query in {delay} seconds")
+        delete_msg = await ctx.send(f"Deleting query in {delay} seconds")
         for i in range(delay):
             delay -= 1
             await delete_msg.edit(f"Deleting query in {delay} seconds")
