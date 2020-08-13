@@ -80,7 +80,10 @@ class Search(commands.Cog):
             embed.add_field(name=item.name, value = f"Buy: **{item.buy}**  ||  Sell: **{item.sell}**", inline = False)
         if list:
             ##return await ctx.send(embed=embed, delete_after= 20.0)
-            return await ctx.send(embed=embed)
+            try:
+                return await ctx.send(embed=embed)
+            except:
+                await ctx.send(f"Sorry {ctx.author.mention}, try being more specific.")
         return None
     
     async def delete_countdown(self, ctx, delay):
@@ -113,7 +116,8 @@ class Search(commands.Cog):
     @commands.command()
     async def price(self, ctx, *args):
         name = " ".join(args)
-        await self.output_results(*self.search_traders(name.lower().strip()), ctx=ctx)
+        if len(args) > 0:
+            await self.output_results(*self.search_traders(name.lower().strip()), ctx=ctx)
         
     # @commands.command()
     # async def test(self, ctx):
