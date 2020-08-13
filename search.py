@@ -78,27 +78,37 @@ class Search(commands.Cog):
             embed.add_field(name=item.name, value = f"Buy: **{item.buy}**  ||  Sell: **{item.sell}**", inline = False)
         if list:
             return await ctx.send(embed=embed)
-            
+        return None
+    
+    async delete_query(self, delaymsgs_to_delete):
+        delete_msg = await ctx.send(f"Deleting query in {delay} seconds")
+        for i in range(delay):
+            delay -= 1
+            await delete_msg.edit(content = f"Deleting query in {delay} seconds")
+            await asyncio.sleep(1)
+        msgs_to_delete.append(delete_msg)
+        msgs_to_delete.append(ctx.message)
+        await ctx.channel.delete_messages(msgs_to_delete)
+        
     async def output_results(self, *args, ctx):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
         msgs_to_delete = []
         for trader, results in zip(traders, args):
             if results:
                 msg = await self.print_list(trader, results, ctx)
-                msgs_to_delete.append(msg)
+                if msg:
+                    msgs_to_delete.append(msg)
         #could just use message.delete(delay)
         if not msgs_to_delete:
             ctx.send(f"Sorry {ctx.author.mention}, couldn't find anything.")
         else:
-            delay = 15
-            delete_msg = await ctx.send(f"Deleting query in {delay} seconds")
-            for i in range(delay):
-                delay -= 1
-                await delete_msg.edit(content = f"Deleting query in {delay} seconds")
-                await asyncio.sleep(1)
-            msgs_to_delete.append(delete_msg)
-            msgs_to_delete.append(ctx.message)
-            await ctx.channel.delete_messages(msgs_to_delete)
+            try:
+                fut = asyncio.run_coroutine_threadsafe(self.delete_query(ctx, 15, msgs_to_delete), self.bot.loop)
+                fut.result()
+            except Exception as e:
+                print(e)  
+                
+                
         
     @commands.command()
     async def price(self, ctx, *args):
