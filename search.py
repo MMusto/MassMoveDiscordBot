@@ -82,7 +82,7 @@ class Search(commands.Cog):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
         for trader, results in zip(traders, args):
             if results:
-                await print_list(trader, results, ctx)
+                await self.print_list(trader, results, ctx)
         
     @commands.command()
     async def price(self, ctx, *args):
