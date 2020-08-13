@@ -5,7 +5,7 @@ import pickle
 import asyncio
 
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
 class Search(commands.Cog):
     def __init__(self, bot):
@@ -50,8 +50,10 @@ class Search(commands.Cog):
             for col in name_cols:
                 buy = df.at[row, buy_cols[col]]
                 sell =  df.at[row, sell_cols[col]]
-                if not pd.isnull(buy) and not pd.isnull(sell):
-                    name = df.at[row, col]
+                
+                # if pd.notna(buy) and pd.notna(sell):
+                name = df.at[row, col]
+                if type(name) is str and not(pd.isna(buy) and pd.isna(sell)):
                     items.append(Item(name, buy, sell))
 
         return items
@@ -77,40 +79,54 @@ class Search(commands.Cog):
         for item in list:
             embed.add_field(name=item.name, value = f"Buy: **{item.buy}**  ||  Sell: **{item.sell}**", inline = False)
         if list:
-            return await ctx.send(embed=embed)
+            return await ctx.send(embed=embed, delete_after= 20.0)
         return None
     
-    async def delete_query(self, ctx, delay, msgs_to_delete):
-        delete_msg = await ctx.send(f"Deleting query in {delay} seconds")
+    async def delete_countdown(self, ctx, delay):
+        embed = discord.Embed(color = 0xDF0000)
+        embed.set_footer(text = f"Deleting query in {delay} seconds")
+        delete_msg = await ctx.send(embed = embed)
         for i in range(delay):
+            await asyncio.sleep(0.75)
             delay -= 1
-            await delete_msg.edit(content = f"Deleting query in {delay} seconds")
-            await asyncio.sleep(1)
-        msgs_to_delete.append(delete_msg)
-        msgs_to_delete.append(ctx.message)
-        await ctx.channel.delete_messages(msgs_to_delete)
+            new_embed = delete_msg.embeds[0].set_footer(text = f"Deleting query in {delay} seconds")
+            await delete_msg.edit(embed = new_embed)
+        await delete_msg.edit(delete_after=0.0)
+        await ctx.message.edit(delete_after=0.0)
         
     async def output_results(self, *args, ctx):
         traders = ("Green Mountain / Green Forest", "Altar Black Marker", "High Tier Military Trader", "Drugs Trader")
-        msgs_to_delete = []
+        msgs_sent = []
         for trader, results in zip(traders, args):
             if results:
                 msg = await self.print_list(trader, results, ctx)
                 if msg:
-                    msgs_to_delete.append(msg)
+                    msgs_sent.append(msg)
         #could just use message.delete(delay)
-        if not msgs_to_delete:
-            ctx.send(f"Sorry {ctx.author.mention}, couldn't find anything.")
+        if msgs_sent = []:
+            await ctx.send(f"Sorry {ctx.author.mention}, we got nothin'")
         else:
-            try:
-                fut = asyncio.run_coroutine_threadsafe(self.delete_query(ctx, 15, msgs_to_delete), self.bot.loop)
-                fut.result()
-            except Exception as e:
-                print(e)  
-                
-                
+            #delete_msg = await ctx.send(f"Deleting query in {3} seconds")
+            self.bot.loop.create_task(self.delete_countdown(ctx, 15))
         
     @commands.command()
     async def price(self, ctx, *args):
         name = " ".join(args)
         await self.output_results(*self.search_traders(name.lower().strip()), ctx=ctx)
+        
+    # @commands.command()
+    # async def test(self, ctx):
+        # try:
+            # self.bot.loop.create_task(self.slow_count.start("hi"))
+        # except:
+            # pass
+        
+    # @tasks.loop(seconds=1, count=5)
+    # async def slow_count(self, msg):
+        # print(self.slow_count.current_loop, msg)
+
+    # @slow_count.after_loop
+    # async def after_slow_count(self):
+        # print('done!')
+
+    
