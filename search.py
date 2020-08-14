@@ -77,7 +77,8 @@ class Search(commands.Cog):
         drug_items       = [item for item in self.drugs if name.lower() in item.name.lower()].sort(key = sort_by_name)
         res = (basic_items, black_items, hightier_items, drug_items)
         for i in res:
-            i.sort(key = sort_by_name)
+            if i:
+                i.sort(key = sort_by_name)
         return res
         
     async def print_list(self, trader, list, ctx):
