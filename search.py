@@ -75,8 +75,10 @@ class Search(commands.Cog):
         black_items      = [item for item in self.black_market_items if name in item.name.lower().strip()].sort(key = sort_by_name)
         hightier_items   = [item for item in self.high_tier_items if name in item.name.lower().strip()].sort(key = sort_by_name)
         drug_items       = [item for item in self.drugs if name.lower() in item.name.lower()].sort(key = sort_by_name)
-        
-        return (basic_items, black_items, hightier_items, drug_items)
+        res = (basic_items, black_items, hightier_items, drug_items)
+        for i in res:
+            i.sort(key = sort_by_name)
+        return res
         
     async def print_list(self, trader, list, ctx):
         embed = discord.Embed(title= f"**{trader}**", color=0x09dee1)
