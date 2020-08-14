@@ -70,11 +70,11 @@ class Search(commands.Cog):
 
     def search_traders(self, name):
         def sort_by_name(item):
-            return item.name
-        basic_items      = [item for item in self.basic_traders_items if name in item.name.lower().strip()].sorted(key = sort_by_name)
-        black_items      = [item for item in self.black_market_items if name in item.name.lower().strip()].sorted(key = sort_by_name)
-        hightier_items   = [item for item in self.high_tier_items if name in item.name.lower().strip()].sorted(key = sort_by_name)
-        drug_items       = [item for item in self.drugs if name.lower() in item.name.lower()].sorted(key = sort_by_name)
+            return (item.name, item.buy, item.sell)
+        basic_items      = [item for item in self.basic_traders_items if name in item.name.lower().strip()].sort(key = sort_by_name)
+        black_items      = [item for item in self.black_market_items if name in item.name.lower().strip()].sort(key = sort_by_name)
+        hightier_items   = [item for item in self.high_tier_items if name in item.name.lower().strip()].sort(key = sort_by_name)
+        drug_items       = [item for item in self.drugs if name.lower() in item.name.lower()].sort(key = sort_by_name)
         
         return (basic_items, black_items, hightier_items, drug_items)
         
