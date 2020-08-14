@@ -76,7 +76,7 @@ class Search(commands.Cog):
         hightier_items   = [item for item in self.high_tier_items if name in item.name.lower().strip()]
         drug_items       = [item for item in self.drugs if name.lower() in item.name.lower()]
         res = (basic_items, black_items, hightier_items, drug_items)
-        for i in res:
+        for i in res[:-1]:
             if i:
                 i.sort(key = sort_by_name)
         return res
