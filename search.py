@@ -125,7 +125,7 @@ class Search(commands.Cog):
         """Quickly get trader prices."""
         if len(args) > 0:
             name = " ".join(args).lower().strip()
-            await self.output_results(*self.search_traders(name, ctx=ctx)   
+            await self.output_results(*self.search_traders(name), ctx=ctx)   
             
     @commands.command()
     async def dfm(self, ctx):
