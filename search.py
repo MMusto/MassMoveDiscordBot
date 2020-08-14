@@ -74,7 +74,7 @@ class Search(commands.Cog):
         basic_items      = [item for item in self.basic_traders_items if name in item.name.lower().strip()]
         black_items      = [item for item in self.black_market_items if name in item.name.lower().strip()]
         hightier_items   = [item for item in self.high_tier_items if name in item.name.lower().strip()]
-        drug_items       = [item for item in self.drugs if name.lower() in item.name.lower()]
+        drug_items       = [item for item in self.drugs if name in item.name.lower()]
         res = (basic_items, black_items, hightier_items, drug_items)
         for i in res[:-1]:
             if i:
