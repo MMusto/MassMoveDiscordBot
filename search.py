@@ -11,6 +11,7 @@ from discord.ext import commands, tasks
 
 SPEADSHEET_URL = "https://docs.google.com/feeds/download/spreadsheets/Export?key=1hN-gHW56u6Z7fts8q1uPpz7KQNM5NE18yrhjP2VZ0ZI&exportFormat=xlsx"
 TRADER_FILE_PATH = "./Trader.xlsx"
+TRADER_CHANNEL_ID = 496101784847122451#743576881806442537
 
 class Search(commands.Cog):
     def __init__(self, bot):
@@ -110,7 +111,7 @@ class Search(commands.Cog):
     @commands.command(aliases=['p', 'search', 'cost'])
     async def price(self, ctx, *args):
         """Quickly get trader prices. Alias: p, search, cost"""
-        if len(args) > 0 and "mass-move" in ctx.channel.name.lower():
+        if len(args) > 0 and TRADER_CHANNEL_ID == ctx.channel.id:
             name = " ".join(args).lower().strip()
             await self.output_results(*self.search_traders(name), ctx=ctx)   
             
@@ -122,7 +123,7 @@ class Search(commands.Cog):
         
     @commands.command(name = "update")
     async def update(self, ctx, *args):
-        """Update trader prices from Google Spreadsheet"""
+        """Update trader prices from Google Spreadsheet. Must be Admin or Dev."""
         #os.remove(TRADER_FILE_PATH)
         if len(args) == 1 and args[0].lower() == "prices":
             if ctx.author.id in self.ids or ctx.author.guild_permissions.administrator:
