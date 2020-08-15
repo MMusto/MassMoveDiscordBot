@@ -27,8 +27,6 @@ main_server = None
 
 @client.event
 async def on_ready():
-    #client.loop.create_task(bg())
-    
     await start_mass_move_reactions()
     print(client.user.name)
     print("**********THE BOT IS READY**********")
@@ -218,7 +216,12 @@ async def lib(ctx, url):
         await ctx.send(f"MP3 Name List: {', '.join(sounds)}")
     else:
         await ctx.send(f"Sorry {ctx.author.mention}, I couldn't find the MP3 file called '{url}'.")
-        
+
+@client.command(name = "test", pass_context=True)
+async def test(ctx):
+    print(type(ctx.channel))
+    print(f"Channel is discord.TextChannel: {type(ctx.channel) is discord.channel.TextChannel}")
+    print(f"Channel is discord.DMChannel: {type(ctx.channel) is discord.channel.DMChannel}")
 client.add_cog(Search(client))
 #Run bot
 client.add_cog(Music(client))

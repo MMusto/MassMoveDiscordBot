@@ -1,41 +1,53 @@
 import pandas as pd
 from item import Item
 import os
-import pickle
-import asyncio
+import urllib.request
+import shutil
 
+import asyncio
 import discord
 from discord.ext import commands, tasks
+
+
+SPEADSHEET_URL = "https://docs.google.com/feeds/download/spreadsheets/Export?key=1hN-gHW56u6Z7fts8q1uPpz7KQNM5NE18yrhjP2VZ0ZI&exportFormat=xlsx"
+TRADER_FILE_PATH = "./Trader.xlsx"
 
 class Search(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.basic_traders_items = self.get_items(1)
-        self.black_market_items  = self.get_items(2)
-        self.high_tier_items     = self.get_items(3)
-        self.drugs               = [
-                            Item(name = "Black Drug Brick", sell = 100_000),
-                            Item(name = "Blue Meth", sell = 80_000),
-                            Item(name = "Blue Candy", sell = 60_000),
-                            Item(name = "Red Candy", sell = 40_000),
-                            Item(name = "Purple Candy", sell = 20_000),
-                            Item(name = "Green Candy", sell = 10_000),
-                            Item(name = "White Candy", sell = 5_000),
-                            Item(name = "Beige Candy", sell = 2_500)
-                          ]
-                            
         self.ids = (140976154512326656, 182639405159153664, 275667331009478667)
+        self.download_trader_file()
+        self.get_items()
+        
+    def get_items(self):
+        self.basic_traders_items = self.parse_sheet(1)
+        self.black_market_items  = self.parse_sheet(2)
+        self.high_tier_items     = self.parse_sheet(3)
+        self.drugs               = [
+                                    Item(name = "Black Drug Brick", sell = 100_000),
+                                    Item(name = "Blue Meth", sell = 80_000),
+                                    Item(name = "Blue Candy", sell = 60_000),
+                                    Item(name = "Red Candy", sell = 40_000),
+                                    Item(name = "Purple Candy", sell = 20_000),
+                                    Item(name = "Green Candy", sell = 10_000),
+                                    Item(name = "White Candy", sell = 5_000),
+                                    Item(name = "Beige Candy", sell = 2_500)
+                                   ]
+                          
+    def download_trader_file(self):
+        with urllib.request.urlopen(SPEADSHEET_URL) as response, open(TRADER_FILE_PATH, 'wb') as out_file:
+            shutil.copyfileobj(response, out_file)
 
-    def get_items(self, sheet_name):
-        df = self.get_dataframe(sheet_name)
+    def parse_sheet(self, sheet_name):
+        df = pd.read_excel(TRADER_FILE_PATH, sheet_name,  usecols="B:C,D,E,G:H,I,J,L:M,N,O,Q:R,S,T")
         
         df.columns = [str(i) for i in range(df.shape[1])]
-
         name_cols = ("0","4","8","12")
         buy_cols = {"0":"2", "4":"6","8":"10", "12":"14"}
         sell_cols = {"0":"3", "4":"7","8":"11", "12":"15"}
         drop_cols = ["1","5","9","13"]
         df = df.drop(columns = drop_cols)
+        
         rows_to_drop = []
         for row in df.index:
             all_types = set()
@@ -60,14 +72,6 @@ class Search(commands.Cog):
 
         return items
         
-    def get_dataframe(self, sheet_name):
-        try:
-            df =  pickle.load(open(f"trader_data_{sheet_name}.pickle", "rb"))
-        except:
-            df = pd.read_excel("Trader.xlsx", sheet_name,  usecols="B:C,D,E,G:H,I,J,L:M,N,O,Q:R,S,T")
-            pickle.dump(df, open(f"trader_data_{sheet_name}.pickle", "wb"))
-        return df
-
     def search_traders(self, name):
         def sort_by_name(item):
             return (item.name, item.buy, item.sell)
@@ -76,53 +80,36 @@ class Search(commands.Cog):
         hightier_items   = [item for item in self.high_tier_items if name in item.name.lower().strip()]
         drug_items       = [item for item in self.drugs if name in item.name.lower()]
         res = (basic_items, black_items, hightier_items, drug_items)
+        #Don't sort drug list
         for i in res[:-1]:
             if i:
                 i.sort(key = sort_by_name)
         return res
         
-    async def print_list(self, trader, list, ctx):
+    def create_embed(self, trader, result, ctx):
         embed = discord.Embed(title= f"**{trader}**", color=0x09dee1)
-        for item in list:
+        for item in result:
             embed.add_field(name=item.name, value = f"Buy: **{item.buy}**  ||  Sell: **{item.sell}**", inline = False)
-        if list:
-            ##return await ctx.send(embed=embed, delete_after= 20.0)
-            try:
-                return await ctx.send(embed=embed)
-            except:
-                return None
+        if result:
+            return embed
         return None
     
-    async def delete_countdown(self, ctx, delay):
-        embed = discord.Embed(color = 0xDF0000)
-        embed.set_footer(text = f"Deleting query in {delay} seconds")
-        delete_msg = await ctx.send(embed = embed)
-        for i in range(delay):
-            await asyncio.sleep(0.75)
-            delay -= 1
-            new_embed = delete_msg.embeds[0].set_footer(text = f"Deleting query in {delay} seconds")
-            await delete_msg.edit(embed = new_embed)
-        await delete_msg.edit(delete_after=0.0)
-        #await ctx.message.edit(delete_after=0.0)
-        
-    async def output_results(self, *args, ctx):
+    async def output_results(self, *results, ctx):
         traders = ("Green Mountain / Green Forest", "Altar Black Market", "High Tier Military Trader", "Drugs Trader")
-        msgs_sent = []
-        for trader, results in zip(traders, args):
-            if results:
-                msg = await self.print_list(trader, results, ctx)
-                if msg:
-                    msgs_sent.append(msg)
-        #could just use message.delete(delay)
-        if msgs_sent == []:
+        embeds = []
+        for trader, result in zip(traders, results):
+            if result:
+                embed = self.create_embed(trader, result, ctx)
+                if embed:
+                    embeds.append(ctx.send(embed = embed))
+        if embeds == []:
             await ctx.send(f"Sorry {ctx.author.mention}, I couldn't find anything.")
         else:
-            pass
-            #self.bot.loop.create_task(self.delete_countdown(ctx, 15))
+            await asyncio.gather(*embeds)
         
     @commands.command(aliases=['p', 'search', 'cost'])
     async def price(self, ctx, *args):
-        """Quickly get trader prices."""
+        """Quickly get trader prices. Alias: p, search, cost"""
         if len(args) > 0:
             name = " ".join(args).lower().strip()
             await self.output_results(*self.search_traders(name), ctx=ctx)   
@@ -133,19 +120,20 @@ class Search(commands.Cog):
         if ctx.message.author.id in self.ids:
             await ctx.send("I'm going down for maintenance. Be back soon!")
         
-    # @commands.command()
-    # async def test(self, ctx):
-        # try:
-            # self.bot.loop.create_task(self.slow_count.start("hi"))
-        # except:
-            # pass
+    @commands.command(name = "update")
+    async def update(self, ctx, *args):
+        """Update trader prices from Google Spreadsheet"""
+        #os.remove(TRADER_FILE_PATH)
+        if len(args) == 1 and args[0].lower() == "prices":
+            if ctx.author.id in self.ids or ctx.author.guild_permissions.administrator:
+                self.download_trader_file()
+                self.get_items()
+                await ctx.send(embed = discord.Embed(title = "**Trader Prices Successfully Updated!**", color = 0x00f715))
+            else:
+                await ctx.send(f"Sorry {ctx.author.mention}, you don't have permission for that!")
+     
+    @commands.command(hidden=True)
+    async def admin(self, ctx):
+        print(f"{self.bot.user} is admin = {ctx.guild.me.guild_permissions.administrator}")
         
-    # @tasks.loop(seconds=1, count=5)
-    # async def slow_count(self, msg):
-        # print(self.slow_count.current_loop, msg)
-
-    # @slow_count.after_loop
-    # async def after_slow_count(self):
-        # print('done!')
-
     
