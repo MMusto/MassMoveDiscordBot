@@ -10,6 +10,7 @@ from musicplayer  import *
 import asyncio
 import utility
 from search import Search
+#from snooper import Snooper
 
 #Documentation used: https://discordpy.readthedocs.io/en/latest/api.html
 
@@ -216,13 +217,8 @@ async def lib(ctx, url):
         await ctx.send(f"MP3 Name List: {', '.join(sounds)}")
     else:
         await ctx.send(f"Sorry {ctx.author.mention}, I couldn't find the MP3 file called '{url}'.")
-
-@client.command(name = "test", pass_context=True)
-async def test(ctx):
-    print(type(ctx.channel))
-    print(f"Channel is discord.TextChannel: {type(ctx.channel) is discord.channel.TextChannel}")
-    print(f"Channel is discord.DMChannel: {type(ctx.channel) is discord.channel.DMChannel}")
 client.add_cog(Search(client))
+#client.add_cog(Snooper(client))
 #Run bot
-client.add_cog(Music(client))
+#client.add_cog(Music(client))
 client.run(TOKEN)

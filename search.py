@@ -132,9 +132,5 @@ class Search(commands.Cog):
                 await ctx.send(embed = discord.Embed(title = "**Trader Prices Successfully Updated!**", color = 0x00f715))
             else:
                 await ctx.send(f"Sorry {ctx.author.mention}, you don't have permission for that!")
-     
-    @commands.command(hidden=True)
-    async def admin(self, ctx):
-        print(f"{self.bot.user} is admin = {ctx.guild.me.guild_permissions.administrator}")
         
     
