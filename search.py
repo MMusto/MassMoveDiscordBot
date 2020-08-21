@@ -75,7 +75,7 @@ class Search(commands.Cog):
         
     def search_traders(self, name):
         def sort_by_name(item):
-            return (item.name, item.buy, item.sell)
+            return (item.name, str(item.buy), str(item.sell))
         basic_items      = [item for item in self.basic_traders_items if name in item.name.lower().strip()]
         black_items      = [item for item in self.black_market_items if name in item.name.lower().strip()]
         hightier_items   = [item for item in self.high_tier_items if name in item.name.lower().strip()]
