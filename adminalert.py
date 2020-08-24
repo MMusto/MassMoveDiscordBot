@@ -7,7 +7,7 @@ PASTE_SERVER_ID     = 744359979150213212
 WATCH_CHANNEL_ID    = 744659204773511239
 MENTION_ROLE        = 744384313025363978
 CONTROL_ID          = 747324151642980433
-SPOTS = [["Base", [7672,0,12114]], ["High Tier", [6900,0,11400]], ["Troitskoe", [7912,0,14686]], ["VMC", [4502,0,8284]], ["NWAF Barracks", [4535,0,9607]], ["North NWAF", [4100,0,11200]], ["NEAF", [12100,0,12500]]]
+SPOTS = [["Base", [7672,0,12114]], ["High Tier", [6900,0,11400]], ["Troitskoe", [7912,0,14686]], ["NWAF Barracks", [4535,0,9607]], ["VMC", [4502,0,8284]], ["North NWAF", [4100,0,11200]], ["NEAF", [12100,0,12500]], ["Drug Trader", [2000,0,9800]], ["Tisy", [1650,0,14000]]]
 
 def ifl(n):
     return int(float(n))
