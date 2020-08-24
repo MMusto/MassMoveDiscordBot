@@ -125,7 +125,7 @@ class AdminAlert(commands.Cog):
     
     @commands.command()
     async def radius(self, ctx, r):
-        '''Set alert radius'''
+        '''Set alert radius. USAGE - .radius R'''
         try:
             self.radius = int(r)
             # await self.update_topic()
@@ -136,7 +136,7 @@ class AdminAlert(commands.Cog):
     
     @commands.command()
     async def location(self, ctx, x, z, *name):
-        '''Set custom alert center location'''
+        '''Set custom alert center location. USAGE - .location X Y NAME'''
         try:
             if len(name) == 0:
                 self.lstr = "Custom Location"
@@ -182,6 +182,7 @@ class AdminAlert(commands.Cog):
             
     @commands.command()
     async def save(self, ctx):
+        '''Save current alert location to persist through restarts. USAGE - .save"
         await self.update_topic()
     
     
