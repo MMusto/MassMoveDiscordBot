@@ -45,7 +45,7 @@ class AdminAlert(commands.Cog):
         e = discord.Embed(title = "**Locations**")
         for i,s in enumerate(SPOTS, 1):
             e.add_field(name = f"**{i}**", value = s[0])
-        e.set_footer(text="Use 'location' command to set custom locations.")
+        e.set_footer(text="Use 'location X Y NAME' command to set custom locations.")
         await self.control_channel.send(embed = e)
         self.controller = await self.control_channel.send(embed = self.get_embed())
         
@@ -182,7 +182,7 @@ class AdminAlert(commands.Cog):
             
     @commands.command()
     async def save(self, ctx):
-        '''Save current alert location to persist through restarts. USAGE - .save"
+        '''Save current alert location to persist through restarts. USAGE - .save'''
         await self.update_topic()
     
     
