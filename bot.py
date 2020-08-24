@@ -11,6 +11,7 @@ import asyncio
 import utility
 from search import Search
 #from snooper import Snooper
+from adminalert import AdminAlert
 
 #Documentation used: https://discordpy.readthedocs.io/en/latest/api.html
 
@@ -217,8 +218,10 @@ async def lib(ctx, url):
         await ctx.send(f"MP3 Name List: {', '.join(sounds)}")
     else:
         await ctx.send(f"Sorry {ctx.author.mention}, I couldn't find the MP3 file called '{url}'.")
+        
 client.add_cog(Search(client))
 #client.add_cog(Snooper(client))
+client.add_cog(AdminAlert(client))
 #Run bot
 #client.add_cog(Music(client))
 client.run(TOKEN)
