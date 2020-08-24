@@ -118,7 +118,8 @@ class AdminAlert(commands.Cog):
         if message.channel.id == WATCH_CHANNEL_ID and message.author.bot:
             if message.embeds:
                 for e in message.embeds:
-                    await self.process(e)
+                    if len(e.fields) >= 3:
+                        await self.process(e)
         
         if message.guild.id == PASTE_SERVER_ID and message.channel.id == CONTROL_ID and not message.author.bot:
             await message.delete()
