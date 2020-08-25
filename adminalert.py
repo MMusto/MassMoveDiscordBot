@@ -97,7 +97,7 @@ class AdminAlert(commands.Cog):
         x = int(x)
         z = int(z)
         if dist <= self.radius:
-            await self.watch_channel.send(f"{self.mention} {name} ({x}, {z}) is **{dist} m** away from **{self.lstr}** ({int(self.location.x)}, {int(self.location.y)})")
+            await self.watch_channel.send(f"{self.mention} {name} ({x}, {z}) is **{dist} m** away from **{self.lstr}** ({int(self.location.x)}, {int(self.location.Z)})")
 
     async def process(self, embed):
         name    = embed.fields[0].value
