@@ -92,6 +92,7 @@ class AdminAlert(commands.Cog):
         await self.init()
 
     async def check(self, name, x, y, z):
+        print(f"Admin ({name}) : Checking ({self.location.x}, {self.location.z}) against ({x}, {z})")
         dist = self.location.dist(x,y,z)
         dist = int(dist)
         x = int(x)
