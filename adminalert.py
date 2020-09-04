@@ -103,14 +103,15 @@ class AdminAlert(commands.Cog):
         name    = embed.fields[0].value
         details = embed.fields[2].value.lower()
         
-        if "crosshair" in details:
-            coords = details.split("<")[-1][:-3]
-            x,y,z = (ifl(i) for i in coords.split(","))
-            await self.check(name, x,y,z)
-        elif "(pos=" in details:
-            coords = details.split("=")[-1][:-2]
-            x,y,z = (ifl(i) for i in coords.split(","))
-            await self.check(name, x,y,z)
+        if "teleport" in details:
+            if "crosshair" in details:
+                coords = details.split("<")[-1][:-3]
+                x,y,z = (ifl(i) for i in coords.split(","))
+                await self.check(name, x,y,z)
+            elif "(pos=" in details:
+                coords = details.split("=")[-1][:-2]
+                x,y,z = (ifl(i) for i in coords.split(","))
+                await self.check(name, x,y,z)
 
     @commands.Cog.listener()
     async def on_message(self, message):
