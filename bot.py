@@ -25,7 +25,6 @@ mm_reaction_emoji_1 = '🔼'
 mm_reaction_emoji_2 = '🔵'
 mm_reaction_channel_name = 'mass-move-reactions'
 server_name = 'execute'
-main_server = None
 
 @client.event
 async def on_ready():
@@ -39,13 +38,11 @@ async def on_ready():
 async def start_mass_move_reactions():
     '''Init mass move'''
     global control_panel
-    global main_server
- 
+
     exe = None
     async for server in client.fetch_guilds():
         if server_name in server.name.lower():
             exe = server
-            main_server = server
             break
     if not exe:
         error(f"{server_name} not found in function 'start_mass_move_reactions'")
@@ -193,22 +190,31 @@ async def on_reaction_add(reaction, user):
         # await ctx.message.guild.voice_client.disconnect(force = True)
 
 #https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-pass-a-coroutine-to-the-player-s-after-function
-def dc_bot(error):
-    try:
-        fut = asyncio.run_coroutine_threadsafe(main_server.voice_client.disconnect(), client.loop)
-        fut.result()
-    except Exception as e:
-        print(e)
 
 @client.command(pass_context=True)
-async def lib(ctx, url):
+async def lib(ctx, url, channel = None):
+
     url = url.lower()
     mypath = "./"
     sounds = [f[1:-4] for f in listdir(mypath) if isfile(join(mypath, f)) and f[-3:] == "mp3"]
-    
+    server = ctx.guild
+
+    def dc_bot(error):
+        try:
+            fut = asyncio.run_coroutine_threadsafe(server.voice_client.disconnect(), client.loop)
+            fut.result()
+        except Exception as e:
+            print(e)
+
+    if not server:
+        await ctx.send(f"Sorry {ctx.author.mention}, an error ocurred (Server not found).")
+
     if url in sounds:
-        channel = ctx.message.author.voice.channel
-        server = ctx.message.guild
+        
+        if channel:
+            channel = get_channel(server, channel)
+        else:
+            channel = ctx.message.author.voice.channel
         mp3_file = f'Ω{url}.mp3'
         if server.voice_client == None:
             await channel.connect()

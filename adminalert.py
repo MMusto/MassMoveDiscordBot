@@ -7,7 +7,7 @@ PASTE_SERVER_ID     = 744359979150213212
 WATCH_CHANNEL_ID    = 744659204773511239
 MENTION_ROLE        = 744384313025363978
 CONTROL_ID          = 747324151642980433
-SPOTS = [["Base", [7672,0,12114]], ["High Tier", [6900,0,11400]], ["Troitskoe", [7912,0,14686]], ["NWAF Barracks", [4535,0,9607]], ["VMC", [4502,0,8284]], ["North NWAF", [4100,0,11200]], ["NEAF", [12100,0,12500]], ["Drug Trader", [2000,0,9800]], ["Tisy", [1650,0,14000]]]
+SPOTS = (("Base", (7672,0,12114)), ("High Tier", (6900,0,11400)), ("Troitskoe", (7912,0,14686)), ("NWAF Barracks", (4535,0,9607)), ("VMC", (4502,0,8284)), ("North NWAF", (4100,0,11200)), ("NEAF", (12100,0,12500)), ("Drug Trader", (2000,0,9800)), ("Tisy", (1650,0,14000)))
 
 def ifl(n):
     return int(float(n))
@@ -18,7 +18,7 @@ class Location():
         self.y = y
         self.z = z
 
-    def update(self, x, y, z):
+    async def update(self, x, y, z):
         self.x = x
         self.y = y
         self.z = z
@@ -47,24 +47,24 @@ class AdminAlert(commands.Cog):
             e.add_field(name = f"**{i}**", value = s[0])
         e.set_footer(text="Use 'location X Y NAME' command to set custom locations.")
         await self.control_channel.send(embed = e)
-        self.controller = await self.control_channel.send(embed = self.get_embed())
+        self.controller = await self.control_channel.send(embed = self.get_embed(name, loc, r))
         
         await self.controller.add_reaction("🏠")
         await self.controller.add_reaction("◀️")
         await self.controller.add_reaction("▶️")
         await self.controller.add_reaction("🔼")
         await self.controller.add_reaction("🔽")
-        await self.update_embed()
+        #await self.update_embed()
         
-    def get_embed(self):
+    def get_embed(self, name, location, radius):
         embed = discord.Embed(title = "**ADMIN ALERTS**")
-        embed.add_field(name = "Current Location:", value = f"**{self.lstr}**", inline=False)
-        embed.add_field(name = "Coordinates:", value = f"(**{self.location.x}**, **{self.location.z}**)", inline = False)
-        embed.add_field(name = "Radius:", value = f"**{self.radius}**", inline = False)
+        embed.add_field(name = "Current Location:", value = f"**{name}**", inline=False)
+        embed.add_field(name = "Coordinates:", value = f"(**{location.x}**, **{location.z}**)", inline = False)
+        embed.add_field(name = "Radius:", value = f"**{radius}**", inline = False)
         return embed
         
-    async def update_embed(self):
-        await self.controller.edit(embed = self.get_embed())
+    async def update_embed(self, name, loc, r):
+        await self.controller.edit(embed = self.get_embed(name, loc, r))
         
     async def update_topic(self):
         await self.control_channel.edit(topic = f"{self.lstr}|{self.location.x},{self.location.y},{self.location.z}|{self.radius}")
@@ -102,8 +102,7 @@ class AdminAlert(commands.Cog):
     async def process(self, embed):
         name    = embed.fields[0].value
         details = embed.fields[2].value.lower()
-        if "teleport" not in details:
-            return
+        
         if "crosshair" in details:
             coords = details.split("<")[-1][:-3]
             x,y,z = (ifl(i) for i in coords.split(","))
@@ -120,9 +119,6 @@ class AdminAlert(commands.Cog):
                 for e in message.embeds:
                     if len(e.fields) >= 3:
                         await self.process(e)
-        
-        if message.guild.id == PASTE_SERVER_ID and message.channel.id == CONTROL_ID and not message.author.bot:
-            await message.delete()
     
     @commands.command()
     async def radius(self, ctx, r):
@@ -130,7 +126,7 @@ class AdminAlert(commands.Cog):
         try:
             self.radius = int(r)
             # await self.update_topic()
-            await self.update_embed()
+            await self.update_embed(self.lstr, self.location, int(r))
             await ctx.send(f"Radius set to **{self.radius}**.")
         except:
             await ctx.send(f"Invalid radius: {r}.")
@@ -144,9 +140,9 @@ class AdminAlert(commands.Cog):
             else:
                 self.lstr = " ".join(name)
                 
-            self.location.update(ifl(x),0,ifl(z))
+            await self.location.update(ifl(x),0,ifl(z))
             # await self.update_topic()
-            await self.update_embed()
+            await self.update_embed(self.lstr, self.location, self.radius)
             self.index = None
             await ctx.send(f"New Alert Center: **{self.lstr}** - (**{x}**, **{z}**)")
         except:
@@ -175,9 +171,10 @@ class AdminAlert(commands.Cog):
                 self.radius -= 500
                 
             self.lstr = new_loc[0]
-            self.location.update(*new_loc[1])
+
+            await self.location.update(*new_loc[1])
             # await self.update_topic()
-            await self.update_embed()
+            await self.update_embed(new_loc[0], self.location, self.radius)
             #await self.update(name = new_loc[0], loc = new_loc[1], r = new_radius)
             await reaction.message.remove_reaction(reaction.emoji, user)
             
@@ -185,5 +182,10 @@ class AdminAlert(commands.Cog):
     async def save(self, ctx):
         '''Save current alert location to persist through restarts. USAGE - .save'''
         await self.update_topic()
+        
+    @commands.command()
+    async def test_cmd(self, ctx):
+        '''should show up'''
+        return
     
     
