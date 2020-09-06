@@ -41,7 +41,7 @@ class AdminAlert(commands.Cog):
         self.location = loc
         self.lstr = name
         self.radius = r
-        await self.control_channel.purge(limit = 10)
+        await self.control_channel.purge(limit = None)
         e = discord.Embed(title = "**Locations**")
         for i,s in enumerate(SPOTS, 1):
             e.add_field(name = f"**{i}**", value = s[0])
