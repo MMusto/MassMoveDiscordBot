@@ -97,7 +97,6 @@ async def mah(ctx) -> None:
     author = ctx.message.author
     server = author.guild
     all_members = server.members
-    channels = server.channels
     if permission_to_move(author):
         if author.voice:
             move_channel = author.voice.channel
@@ -228,5 +227,4 @@ client.add_cog(Search(client))
 #client.add_cog(Snooper(client))
 client.add_cog(AdminAlert(client))
 #Run bot
-#client.add_cog(Music(client))
 client.run(TOKEN)
