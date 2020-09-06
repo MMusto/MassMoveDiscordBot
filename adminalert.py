@@ -45,7 +45,7 @@ class AdminAlert(commands.Cog):
         e = discord.Embed(title = "**Locations**")
         for i,s in enumerate(SPOTS, 1):
             e.add_field(name = f"**{i}**", value = s[0])
-        e.set_footer(text="Use 'location X Y NAME' command to set custom locations.")
+        e.set_footer(text="Use 'preset N' command to set a preset location. (Use 'setlocation X Y NAME' to set custom location.)")
         await self.control_channel.send(embed = e)
         self.controller = await self.control_channel.send(embed = self.get_embed(name, loc, r))
         
