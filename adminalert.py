@@ -49,12 +49,11 @@ class AdminAlert(commands.Cog):
         await self.control_channel.send(embed = e)
         self.controller = await self.control_channel.send(embed = self.get_embed(name, loc, r))
         
-        await self.controller.add_reaction("🏠")
-        await self.controller.add_reaction("◀️")
-        await self.controller.add_reaction("▶️")
-        await self.controller.add_reaction("🔼")
-        await self.controller.add_reaction("🔽")
-        #await self.update_embed()
+        # await self.controller.add_reaction("🏠")
+        # await self.controller.add_reaction("◀️")
+        # await self.controller.add_reaction("▶️")
+        # await self.controller.add_reaction("🔼")
+        # await self.controller.add_reaction("🔽")
         
     def get_embed(self, name, location, radius):
         embed = discord.Embed(title = "**ADMIN ALERTS**")
@@ -123,7 +122,7 @@ class AdminAlert(commands.Cog):
                         await self.process(e)
     
     @commands.command()
-    async def radius(self, ctx, r):
+    async def setradius(self, ctx, r):
         '''Set alert radius. USAGE - .radius R'''
         try:
             self.radius = int(r)
@@ -134,8 +133,8 @@ class AdminAlert(commands.Cog):
             await ctx.send(f"Invalid radius: {r}.")
     
     @commands.command()
-    async def location(self, ctx, x, z, *name):
-        '''Set custom alert center location. USAGE - .location X Y NAME'''
+    async def setlocation(self, ctx, x, z, *name):
+        '''Set custom alert center location. USAGE - .setlocation X Y NAME'''
         try:
             if len(name) == 0:
                 self.lstr = "Custom Location"
@@ -150,35 +149,33 @@ class AdminAlert(commands.Cog):
         except:
             await ctx.send(f"Invalid coordinates: ({x}, {z}).")
 
-    @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
-        if user != self.bot.user and reaction.message.id == self.controller.id:
-            if type(self.index) is int:
-                if reaction.emoji == '🏠':
-                    self.index = 0
-                if reaction.emoji == "◀️":
-                    self.index -= 1
-                    self.index %= len(SPOTS)
-                if reaction.emoji == "▶️":
-                    self.index += 1
-                    self.index %= len(SPOTS)
-            else:
-                self.index = 0
+    # @commands.Cog.listener()
+    # async def on_reaction_add(self, reaction, user):
+        # if user != self.bot.user and reaction.message.id == self.controller.id:
+            # if type(self.index) is int:
+                # if reaction.emoji == '🏠':
+                    # self.index = 0
+                # if reaction.emoji == "◀️":
+                    # self.index -= 1
+                    # self.index %= len(SPOTS)
+                # if reaction.emoji == "▶️":
+                    # self.index += 1
+                    # self.index %= len(SPOTS)
+            # else:
+                # self.index = 0
             
-            new_loc = SPOTS[self.index]
+            # new_loc = SPOTS[self.index]
             
-            if reaction.emoji == "🔼":
-                self.radius += 500
-            if reaction.emoji == "🔽":
-                self.radius -= 500
+            # if reaction.emoji == "🔼":
+                # self.radius += 500
+            # if reaction.emoji == "🔽":
+                # self.radius -= 500
                 
-            self.lstr = new_loc[0]
+            # self.lstr = new_loc[0]
 
-            await self.location.update(*new_loc[1])
-            # await self.update_topic()
-            await self.update_embed(new_loc[0], self.location, self.radius)
-            #await self.update(name = new_loc[0], loc = new_loc[1], r = new_radius)
-            await reaction.message.remove_reaction(reaction.emoji, user)
+            # await self.location.update(*new_loc[1])
+            # await self.update_embed(new_loc[0], self.location, self.radius)
+            # await reaction.message.remove_reaction(reaction.emoji, user)
             
     @commands.command()
     async def save(self, ctx):
@@ -186,8 +183,13 @@ class AdminAlert(commands.Cog):
         await self.update_topic()
         
     @commands.command()
-    async def test_cmd(self, ctx):
-        '''should show up'''
-        return
-    
+    async def preset(self, ctx, index = -1):
+        '''Sets admin alert location preset. Usage: "set 1"'''
+        if index <= 0:
+            ctx.send(f"Invalid preset number : {index}")
+            return
+        new_loc = SPOTS[index%len(SPOTS)-1]
+        self.lstr = new_loc[0]
+        await self.location.update(*new_loc[1])
+        await self.update_embed(new_loc[0], self.location, self.radius)
     
