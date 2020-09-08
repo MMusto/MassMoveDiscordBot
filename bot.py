@@ -4,7 +4,6 @@ from os import listdir
 from os.path import isfile, join
 import youtube_dl
 import discord
-from discord import opus
 from helper import *
 import asyncio
 import utility
