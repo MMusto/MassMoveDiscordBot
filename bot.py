@@ -181,7 +181,7 @@ async def on_reaction_add(reaction, user):
             await next_reaction.message.remove_reaction(mm_reaction_emoji_2, user)
             await asyncio.gather(*lst)
             
-@client.command(pass_context=True, aliases = ("disconnect"))
+@client.command(pass_context=True, aliases = ("disconnect",))
 async def leave(ctx):
     if permission_to_move(ctx.message.author) and ctx.message.guild.voice_client:
         await ctx.message.guild.voice_client.disconnect(force = True)
@@ -210,7 +210,7 @@ async def verify_channel(ctx, channel : [str]) -> discord.VoiceChannel:
     return channel
 
 
-@client.command(pass_context=True, name = "join", aliases = ("connect"))
+@client.command(pass_context=True, name = "join", aliases = ("connect",))
 async def _join(ctx, *channel):
     if not ctx.message.guild.voice_client:
         channel = await verify_channel(ctx, channel)
