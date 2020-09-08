@@ -181,15 +181,48 @@ async def on_reaction_add(reaction, user):
             await next_reaction.message.remove_reaction(mm_reaction_emoji_2, user)
             await asyncio.gather(*lst)
             
-# @client.command(pass_context=True)
-# async def leave(ctx):
-    # if permission_to_move(ctx.message.author) and ctx.message.guild.voice_client:
-        # await ctx.message.guild.voice_client.disconnect(force = True)
+@client.command(pass_context=True, aliases = ("disconnect"))
+async def leave(ctx):
+    if permission_to_move(ctx.message.author) and ctx.message.guild.voice_client:
+        await ctx.message.guild.voice_client.disconnect(force = True)
 
+async def verify_channel(ctx, channel : [str]) -> discord.VoiceChannel:
+    ''' 
+        If channel name is given, channel with that name is returned. 
+        If no channel name is given, voice channel of author is returned
+        If no channel name is given and author is not in a voice channel, None is returned
+    '''
+
+    server = ctx.guild
+
+    if len(channel) > 0:
+        to_find = "-".join(channel)
+        channel = get_channel(server, to_find)
+        if not channel:
+            await ctx.send(f"Sorry {ctx.author.mention}, couldn't find channel named {to_find} in server {server.name}")
+            return None
+    elif ctx.message.author.voice:
+        channel = ctx.message.author.voice.channel
+    else:
+        await ctx.send(f"Sorry {ctx.author.mention}, you must be in a voice channel, or specify a voice channel.")
+        return None
+
+    return channel
+
+
+@client.command(pass_context=True, name = "join", aliases = ("connect"))
+async def _join(ctx, *channel):
+    if not ctx.message.guild.voice_client:
+        channel = await verify_channel(ctx, channel)
+        if channel:
+            await channel.connect()
+    else:
+        await ctx.send("Voice client already connected.")
+        return
 #https://discordpy.readthedocs.io/en/latest/faq.html#how-do-i-pass-a-coroutine-to-the-player-s-after-function
 
 @client.command(pass_context=True)
-async def lib(ctx, url, channel = None):
+async def lib(ctx, url, *channel):
 
     url = url.lower()
     mypath = "./"
@@ -207,11 +240,9 @@ async def lib(ctx, url, channel = None):
         await ctx.send(f"Sorry {ctx.author.mention}, an error ocurred (Server not found).")
 
     if url in sounds:
-        
-        if channel:
-            channel = get_channel(server, channel)
-        else:
-            channel = ctx.message.author.voice.channel
+        channel = await verify_channel(ctx, channel)
+        if not channel:
+            return
         mp3_file = f'Ω{url}.mp3'
         if server.voice_client == None:
             await channel.connect()
