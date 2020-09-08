@@ -10,7 +10,6 @@ import asyncio
 import utility
 from search import Search
 #from snooper import Snooper
-from adminalert import AdminAlert
 
 #Documentation used: https://discordpy.readthedocs.io/en/latest/api.html
 
@@ -225,6 +224,5 @@ async def lib(ctx, url, channel = None):
         
 client.add_cog(Search(client))
 #client.add_cog(Snooper(client))
-client.add_cog(AdminAlert(client))
 #Run bot
 client.run(TOKEN)
