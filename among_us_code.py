@@ -25,3 +25,5 @@ class AmongUs(commands.Cog):
                 await channel.send(f"Among Us Room Code: **{code.upper()}**")
                 print(f"[{(now.hour - 8) % 24}:{now.minute}] Code '{code}' was set by {author.display_name} / {author.name}")
                 self.last_timeStamp = datetime.datetime.utcnow()
+        else:
+            message.delete()
