@@ -13,7 +13,7 @@ class AmongUs(commands.Cog):
         return  code.isalpha() and len(code) == 4
 
     def get_embed(self, code):
-        embed = discord.Embed(title = f"Room Code:", color = 0x00f715)
+        embed = discord.Embed(title = "Room Code:", color = 0x00f715)
         embed.add_field(name = "**{code}**", value = "**   **", inline = False)
         return embed
 
@@ -34,9 +34,3 @@ class AmongUs(commands.Cog):
             else:
                 print(f"[FAILED - {(now.hour - 8) % 24}:{now.minute}] Code TRIED to be set to '{code}' by {author.display_name} / {author.name}")
                 await message.delete()
-                
-    @commands.command(hidden = True)
-    async def testembed(self, ctx):
-        embed = discord.Embed(title = f"Room Code:", color = 0x00f715)
-        embed.add_field(name = "**AMMR**", value = "**   **", inline = False)
-        await ctx.send(embed=embed)
