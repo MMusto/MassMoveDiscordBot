@@ -8,6 +8,7 @@ from helper import *
 import asyncio
 import utility
 from search import Search
+from among_us_code import AmongUs
 #from snooper import Snooper
 
 #Documentation used: https://discordpy.readthedocs.io/en/latest/api.html
@@ -253,6 +254,7 @@ async def lib(ctx, url, *channel):
         await ctx.send(f"Sorry {ctx.author.mention}, I couldn't find the MP3 file called '{url}'.")
         
 client.add_cog(Search(client))
+client.add_cog(AmongUs(client))
 #client.add_cog(Snooper(client))
 #Run bot
 client.run(TOKEN)
