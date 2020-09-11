@@ -12,6 +12,7 @@ class AmongUs(commands.Cog):
         if message.channel.id == CODE_CHANNEL_ID and self.bot.user != message.author:
             channel = message.channel
             code = message.content
+            author = message.author
             await channel.purge(limit=None)
             await channel.send(f"Among Us Room Code: **{code}**")
-            await channel.edit(name = f"among-us-code-{code}")
+            await channel.edit(name = f"among-us-code-{code}", topic = f"Code was set by {author.display_name} / {author.name}")
