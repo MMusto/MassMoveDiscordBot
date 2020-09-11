@@ -32,7 +32,6 @@ class AmongUs(commands.Cog):
                 
     @commands.command(hidden = True)
     async def testembed(self, ctx):
-        embed = discord.Embed(title = f"**Among Us : Room Code**", color = 0x00f715)
+        embed = discord.Embed(title = f"**Among Us - Room Code**", color = 0x00f715)
         embed.add_field(name = "**AMMR**", value = "**   **", inline = False)
-        embed.timestamp = ctx.message.created_at
         await ctx.send(embed=embed)
