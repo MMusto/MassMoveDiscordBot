@@ -12,6 +12,11 @@ class AmongUs(commands.Cog):
     def valid_code(self, code : str):
         return  code.isalpha() and len(code) == 4
 
+    def get_embed(self, code):
+        embed = discord.Embed(title = f"Room Code:", color = 0x00f715)
+        embed.add_field(name = "**{code}**", value = "**   **", inline = False)
+        return embed
+
     @commands.Cog.listener()
     async def on_message(self, message):
         #Taken from https://stackoverflow.com/questions/62503897/how-can-i-limit-the-on-message-replies-discord-python-bot/62504583#62504583
@@ -23,7 +28,7 @@ class AmongUs(commands.Cog):
             author = message.author
             if time_difference > 5  and self.bot.user != author and self.valid_code(code):
                     await channel.purge(limit=None)
-                    await channel.send(f"Among Us Room Code: **{code.upper()}**")
+                    await channel.send(embed = self.get_embed(code.upper()))
                     print(f"[SUCCESS - {(now.hour - 8) % 24}:{now.minute}] Code '{code}' was set by {author.display_name} / {author.name}")
                     self.last_timeStamp = datetime.datetime.utcnow()
             else:
@@ -32,6 +37,6 @@ class AmongUs(commands.Cog):
                 
     @commands.command(hidden = True)
     async def testembed(self, ctx):
-        embed = discord.Embed(title = f"**Among Us - Room Code**", color = 0x00f715)
+        embed = discord.Embed(title = f"Room Code:", color = 0x00f715)
         embed.add_field(name = "**AMMR**", value = "**   **", inline = False)
         await ctx.send(embed=embed)
