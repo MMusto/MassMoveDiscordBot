@@ -14,3 +14,4 @@ class AmongUs(commands.Cog):
             code = message.content
             await channel.purge(limit=None)
             await channel.send(f"Among Us Room Code: **{code}**")
+            await channel.edit(name = f"among-us-code-{code}")
