@@ -9,7 +9,7 @@ class AmongUs(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.channel.id == CODE_CHANNEL_ID and self.bot.user != message.author:
+        if message.channel.id == CODE_CHANNEL_ID and self.bot.user != message.author and len(message.content) == 4:
             channel = message.channel
             code = message.content
             author = message.author
