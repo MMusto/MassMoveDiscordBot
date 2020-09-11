@@ -35,4 +35,4 @@ class AmongUs(commands.Cog):
         embed = discord.Embed(title = f"**AMONG US**")
         embed.add_field(name = "ROOM CODE", value = "**TEST**", inline = False)
         embed.timestamp = ctx.message.created_at
-        ctx.send(embed=embed)
+        await ctx.send(embed=embed)
