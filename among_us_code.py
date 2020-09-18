@@ -53,7 +53,7 @@ class AmongUs(commands.Cog):
             now = datetime.datetime.utcnow()
             time_difference = (now - self.last_timeStamp).total_seconds()
             code = message.content.strip()
-            current_time_str = f"{now.hour - 7) % 24}:{now.minute}"
+            current_time_str = f"{(now.hour - 7) % 24}:{now.minute}"
 
             if time_difference > COOLDOWN and self.valid_code(code):
                     self.last_timeStamp = now
