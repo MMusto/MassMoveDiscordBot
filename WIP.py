@@ -1,3 +1,4 @@
+
 @client.command(pass_context = True)
 async def group(ctx, *arg):
     """ *(WIP)* gathers everyone to channel "name_here" and plays "audio.mp3" """
@@ -17,7 +18,7 @@ async def group(ctx, *arg):
         else:
             names = [name.lower() for name in arg]
             if names != []:
-                for member in [m in all_members if m.voice]:
+                for member in [m for m in all_members if m.voice]:
                     for name in names:
                         remove = False
                         if name in member.name.lower():

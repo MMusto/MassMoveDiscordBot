@@ -17,6 +17,7 @@ from among_us_code import AmongUs
 #the vulnerability of private Discord bot key exposed to public
 TOKEN = os.environ["TOKEN"]
 
+#TODO : Refactor into object cog
 control_panel = None
 message_to_channel = {}
 mm_reaction_emoji_1 = '🔼'
