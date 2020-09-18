@@ -21,12 +21,16 @@ class AmongUs(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         #Taken from https://stackoverflow.com/questions/62503897/how-can-i-limit-the-on-message-replies-discord-python-bot/62504583#62504583
+        
         channel = message.channel
+
         if channel.id == CODE_CHANNEL_ID:
+
             now = datetime.datetime.utcnow()
             time_difference = (now - self.last_timeStamp).total_seconds()
             code = message.content.strip()
             author = message.author
+            
             if time_difference > COOLDOWN  and self.bot.user != author and self.valid_code(code):
                     await channel.purge(limit=None)
                     await channel.send(embed = self.get_embed(code.upper()))
