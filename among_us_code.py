@@ -10,7 +10,7 @@ class AmongUs(commands.Cog):
         self.last_timeStamp = datetime.datetime.utcfromtimestamp(0)
 
     def valid_code(self, code : str):
-        return  code.isalpha() and len(code) == 4
+        return  code.isalpha() and len(code) == 6
 
     def get_embed(self, code):
         embed = discord.Embed(title = "Room Code:", color = 0x00f715)
