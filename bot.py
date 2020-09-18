@@ -26,9 +26,12 @@ server_name = 'execute'
 
 @client.event
 async def on_ready():
+    print(f"[!] {client.user.name} initializing...")
+    print("[!] Initializing mass move reaction channel...")
     await start_mass_move_reactions()
-    print(client.user.name)
-    print("**********THE BOT IS READY**********")
+    print("[!] Mass move reaction initialization complete!")
+    print()
+    print(f"[!] {client.user.name} initialization complete!")
 
 ######################################## MASS_MOVE FUNCTIONS ############################################
 ######################################## MASS_MOVE FUNCTIONS ############################################
