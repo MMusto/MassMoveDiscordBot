@@ -11,9 +11,8 @@ class AmongUs(commands.Cog):
         self.bot = bot
         self.last_timeStamp = datetime.datetime.utcfromtimestamp(0)
 
-    def valid_code(self, code : str):
-        """Returns whether the given Among Us code is valid
-           No preprocessing of the code string is done here. Ex. strip(), lower(), etc.
+    def valid_code(self, code : str) -> bool:
+        """Returns whether the given Among Us code string is valid
 
         Args:
             code (str): code string
@@ -24,16 +23,16 @@ class AmongUs(commands.Cog):
         return code.isalpha() and len(code) == 6
 
     def get_embed(self, code : str) -> discord.Embed:
-        """Returns an embed object with the code string (already formatted) that we can send in a discord message.
+        """Returns a nicely formatted embed object that we can send in a discord message.
 
         Args:
             code (str): formatted code string
 
         Returns:
-            discord.Embed: Nicely formatted embed object
+            discord.Embed: Nicely formatted embed object with Among Us code
         """
         embed = discord.Embed(title = "Room Code:", color = 0x00f715)
-        embed.add_field(name = "**{code}**", value = "**   **", inline = False)
+        embed.add_field(name = f"**{code}**", value = "**   **", inline = False)
         return embed
 
     @commands.Cog.listener()
@@ -44,22 +43,23 @@ class AmongUs(commands.Cog):
            formatted valid code remains in the text channel
 
         Args:
-            message (discord.Message): discord
+            message (discord.Message): discord message (default argument for event listener)
         """
         channel = message.channel
+        author = message.author
 
-        if channel.id == CODE_CHANNEL_ID:
+        if channel.id == CODE_CHANNEL_ID and self.bot.user != author:
 
             now = datetime.datetime.utcnow()
             time_difference = (now - self.last_timeStamp).total_seconds()
             code = message.content.strip()
-            author = message.author
+            current_time_str = f"{now.hour - 7) % 24}:{now.minute}"
 
-            if time_difference > COOLDOWN  and self.bot.user != author and self.valid_code(code):
+            if time_difference > COOLDOWN and self.valid_code(code):
+                    self.last_timeStamp = now
                     await channel.purge(limit=None)
                     await channel.send(embed = self.get_embed(code.upper()))
-                    print(f"[SUCCESS - {(now.hour - 8) % 24}:{now.minute}] Code '{code}' was set by {author.display_name} / {author.name}")
-                    self.last_timeStamp = datetime.datetime.utcnow()
+                    print(f"[SUCCESS - {current_time_str}] Code '{code}' was set by {author.display_name} / {author.name}")
             else:
-                print(f"[FAILED - {(now.hour - 8) % 24}:{now.minute}] Code TRIED to be set to '{code}' by {author.display_name} / {author.name}")
                 await message.delete()
+                print(f"[FAILED - {current_time_str}] Code TRIED to be set to '{code}' by {author.display_name} / {author.name}")
