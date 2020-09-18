@@ -10,6 +10,16 @@ class AmongUs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.last_timeStamp = datetime.datetime.utcfromtimestamp(0)
+    
+    def log(self, msg : str) -> None:
+        """Logs to Heroku log console.
+
+        Args:
+            msg (str): log message
+        """
+        now = datetime.datetime.utcnow()
+        current_time_str = f"{(now.hour - 7) % 24}:{now.minute}"
+        print(f"[{current_time_str}] {msg}")
 
     def valid_code(self, code : str) -> bool:
         """Returns whether the given Among Us code string is valid
@@ -53,13 +63,12 @@ class AmongUs(commands.Cog):
             now = datetime.datetime.utcnow()
             time_difference = (now - self.last_timeStamp).total_seconds()
             code = message.content.strip()
-            current_time_str = f"{(now.hour - 7) % 24}:{now.minute}"
 
             if time_difference > COOLDOWN and self.valid_code(code):
                     self.last_timeStamp = now
                     await channel.purge(limit=None)
                     await channel.send(embed = self.get_embed(code.upper()))
-                    print(f"[SUCCESS - {current_time_str}] Code '{code}' was set by {author.display_name} / {author.name}")
+                    self.log(f"'{code}' was SUCCESSFULLY set by {author.display_name} / {author.name}")
             else:
                 await message.delete()
-                print(f"[FAILED - {current_time_str}] Code TRIED to be set to '{code}' by {author.display_name} / {author.name}")
+                self.log(f"'{code}' FAILED to be set by {author.display_name} / {author.name}")

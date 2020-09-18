@@ -30,7 +30,6 @@ async def on_ready():
     print("[!] Initializing mass move reaction channel...")
     await start_mass_move_reactions()
     print("[!] Mass move reaction initialization complete!")
-    print()
     print(f"[!] {client.user.name} initialization complete!")
 
 ######################################## MASS_MOVE FUNCTIONS ############################################
@@ -61,15 +60,15 @@ async def start_mass_move_reactions():
         error("Control Channel not found in function 'start_mass_move_reactions'")
         return
 		
-    await control_panel.purge(limit=100)
-    #await client.send_message(control_panel, channel_sep)
+    await control_panel.purge(limit=None)
+    
     for channel in sorted(voice_channels.keys(), key = lambda channel_name: voice_channels[channel_name].position):
         name = "**"+channel+"**"
         message = await control_panel.send(embed = discord.Embed(title = name))
         await message.add_reaction( mm_reaction_emoji_1)
         await message.add_reaction( mm_reaction_emoji_2)
         message_to_channel[message.id] = voice_channels[channel].id
-        #await client.send_message(control_panel, channel_sep)
+
     await control_panel.send( f"**Click the {mm_reaction_emoji_1} emoji underneath the channel you wish to move everyone from. Then click the {mm_reaction_emoji_2} emoji underneath the channel you wish to move everyone to.**")
    
 @client.command(pass_context=True)

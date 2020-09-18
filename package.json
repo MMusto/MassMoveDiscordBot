@@ -2,7 +2,7 @@
 "name": "mmbot",
 "version": "1.0.0",
 "description": "Bot to Mass Move Players",
-"main": "bot.js",
+"main": "bot.py",
 "author": "Eden.exe",
 "dependencies": {}
 }
