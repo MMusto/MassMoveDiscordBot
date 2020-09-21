@@ -15,6 +15,7 @@ class Shaker(commands.Cog):
         self.speed = 0.5
         self.lock = asyncio.Lock()
         self.diseased = None
+        self.first = True
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -114,6 +115,7 @@ class Shaker(commands.Cog):
                 await ctx.send(f"{victim.mention} was given dysteria.")
             self.diseased = victim
             # if not self.dysmetria_loop.is_running():
+            self.first = True
             self.dysmetria_loop.start()
         else:
             await ctx.send(f"{name} not found.")
@@ -122,7 +124,10 @@ class Shaker(commands.Cog):
     @tasks.loop(minutes=4)
     async def dysmetria_loop(self):
         if self.diseased.voice:
-            curr_channel = self.diseased.voice.channel
-            all_choices = [channel for channel in curr_channel.guild.voice_channels if channel != curr_channel]
-            await self.diseased.move_to(all_choices[randint(0, len(all_choices) - 1)])
-            self.dysmetria_loop.change_interval(minutes=round(uniform(2, 20), 1))
+            if not self.first:
+                curr_channel = self.diseased.voice.channel
+                all_choices = [channel for channel in curr_channel.guild.voice_channels if channel != curr_channel]
+                await self.diseased.move_to(all_choices[randint(0, len(all_choices) - 1)])
+                self.dysmetria_loop.change_interval(minutes=round(uniform(4, 11), 1))
+            else:
+                self.first = False
