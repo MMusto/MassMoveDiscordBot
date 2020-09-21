@@ -7,7 +7,6 @@ class JoinSound(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.join_mp3 = None
-        self.enabled = False
         self.selected_member = None
 
     @commands.Cog.listener()
@@ -40,17 +39,28 @@ class JoinSound(commands.Cog):
             self.selected_member = m
             await ctx.send(f"{m.mention} is now the trigger!")
 
-    @commands.command(name = "setmsg")
-    async def _set_join_mp3(self, ctx, *msg):
-        """Set custom join message (TTS)
-        """
-        msg = " ".join(msg)
+    @commands.command(name="clearjs", help="Clears custom message and trigger person")
+    async def _clear(self, ctx, name):
+        self.selected_member = None
+        self.join_mp3 = None
+        await ctx.send("JoinSound trigger and message successfully cleared!")
+
+    async def _set_msg(self, ctx, msg):
         if len(msg) > 0:
             mp3_name = f'custom_msg.mp3'
             tts = gTTS(msg)
             tts.save(mp3_name)
             self.join_mp3 = mp3_name
-        await ctx.send("SUCCESS!", delete_after=3)
+            await ctx.send("SUCCESS!", delete_after=3)
+        else:
+            await ctx.send("INVALID MESSAGE!", delete_after=3)
+
+    @commands.command(name = "setmsg")
+    async def _set_single_message(self, ctx, *msg):
+        """Set custom join message (TTS)
+        """
+        msg = " ".join(msg)
+        await self._set_msg(ctx, msg)
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
@@ -71,8 +81,8 @@ class JoinSound(commands.Cog):
             except Exception as e:
                 print(e)
 
-        if member.id == self.selected_member.id:
-            if server.voice_client == None:
+        if self.selected_member and (self.selected_member.id == member.id):
+            if server.voice_client == None and self.join_mp3:
                 await channel.connect()
                 audio_source = discord.FFmpegPCMAudio(self.join_mp3)
                 server.voice_client.play(audio_source, after=dc_bot)
