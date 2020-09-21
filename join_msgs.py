@@ -35,10 +35,10 @@ class JoinSound(commands.Cog):
     async def _set_selected_member(self, ctx, name):
         m = self._get_member(ctx, name)
         if m is None:
-            ctx.send(f"'{name}' was not found!")
+            await ctx.send(f"'{name}' was not found!")
         else:
             self.selected_member = m
-            ctx.send(f"{m.mention} is now the trigger!")
+            await ctx.send(f"{m.mention} is now the trigger!")
 
     @commands.command(name = "setmsg")
     async def _set_join_mp3(self, ctx, *msg):
