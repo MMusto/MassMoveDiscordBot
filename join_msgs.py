@@ -64,16 +64,20 @@ class JoinSound(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        if self.selected_member is None:
-            return
-        channel = after.channel
-        if channel is None:
-            return
-        perms = channel.guild.me.permissions_in(channel)
-        if not self._check_perms(perms):
-            return
-        server = channel.guild
+        quit_conditions = (  
+                            not after,
+                            before and before.channel is after.channel,
+                            after.afk,
+                            self.selected_member is None,
+                            after.channel is None, # first condition might account for this
+                            not self._check_perms(after.channel.guild.me.permissions_in(after.channel))
+                          )
 
+        if any(quit_conditions):
+            return
+
+        channel = after.channel
+        server = channel.guild
         def dc_bot(error):
             try:
                 fut = asyncio.run_coroutine_threadsafe(server.voice_client.disconnect(), self.bot.loop)

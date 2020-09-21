@@ -110,9 +110,9 @@ class Shaker(commands.Cog):
         victim = self._get_member(ctx, name)
         if victim:
             if self.diseased:
-                await ctx.send(f"{self.diseased} was healed. {victim.mention} was given dysteria.")
+                await ctx.send(f"{self.diseased} was healed. {victim.mention} was given dysmetria.")
             else:
-                await ctx.send(f"{victim.mention} was given dysteria.")
+                await ctx.send(f"{victim.mention} was given dysmetria.")
             self.diseased = victim
             # if not self.dysmetria_loop.is_running():
             self.first = True
