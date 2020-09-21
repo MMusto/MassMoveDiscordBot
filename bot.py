@@ -1,6 +1,5 @@
 from client import client as client
-import os
-from os import listdir
+from os import listdir, environ
 from os.path import isfile, join
 import youtube_dl
 import discord
@@ -10,13 +9,14 @@ import utility
 from search import Search
 from among_us_code import AmongUs
 from shaker import Shaker
+from join_msgs import JoinSound
 # from snooper import Snooper
 
 # Documentation used: https://discordpy.readthedocs.io/en/latest/api.html
 
 # Token is stored in Heroku environment to avoid
 # the vulnerability of private Discord bot key exposed to public
-TOKEN = os.environ["TOKEN"]
+TOKEN = environ["TOKEN"]
 
 # TODO : Refactor into object cog
 control_panel = None
@@ -71,6 +71,7 @@ async def start_mass_move_reactions():
         message_to_channel[message.id] = voice_channels[channel].id
 
     await control_panel.send(f"**Click the {mm_reaction_emoji_1} emoji underneath the channel you wish to move everyone from. Then click the {mm_reaction_emoji_2} emoji underneath the channel you wish to move everyone to.**")
+    
 @client.command(pass_context=True)
 async def rr(ctx):
     if(permission_to_move(ctx.message.author)):
@@ -257,6 +258,7 @@ async def lib(ctx, url, *channel):
 client.add_cog(Search(client))
 client.add_cog(AmongUs(client))
 client.add_cog(Shaker(client))
+client.add_cog(JoinSound(client))
 # client.add_cog(Snooper(client))
 # Run bot
 client.run(TOKEN)

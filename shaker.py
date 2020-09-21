@@ -2,6 +2,11 @@ from discord.ext import tasks, commands
 from random import randint, uniform
 import asyncio
 
+def shaker_check():
+    def predicate(ctx):
+        return ctx.message.author.id == 140976154512326656
+    return commands.check(predicate)
+
 class Shaker(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -26,11 +31,6 @@ class Shaker(commands.Cog):
                     result = member
                     break
         return result
-
-    def shaker_check():
-        def predicate(ctx):
-            return ctx.message.author.id == 140976154512326656
-        return commands.check(predicate)
 
     @commands.command(name="shakespeed", help="Set the shake speed.")
     @shaker_check()
