@@ -1,42 +1,7 @@
-
-@client.command(pass_context = True)
-async def group(ctx, *arg):
-    """ *(WIP)* gathers everyone to channel "name_here" and plays "audio.mp3" """
-    group_listen_channel = "Gathering Room"
-    audio_file = 'audio.mp3'
-    if ctx.message.author.server_permissions.move_members:
-        server = ctx.message.server
-        all_members = server.members
-        channel = get_channel(server, group_listen_channel)
-        voice = await client.join_voice_channel(channel)
-        player = voice.create_ffmpeg_player(filename = audio_file)
-        members_to_move = set()
-        if (arg[0] == 'ALL'):
-            for member1 in all_members:
-                if(member1.voice_channel != None and not member1.is_afk):
-                    await client.move_member(member1, channel)
-        else:
-            names = [name.lower() for name in arg]
-            if names != []:
-                for member in [m for m in all_members if m.voice]:
-                    for name in names:
-                        remove = False
-                        if name in member.name.lower():
-                            members_to_move.add(member)
-                            remove = True
-                        if member.nick != None and name in member.nick.lower():
-                            members_to_move.add(member)
-                            remove = True
-                        if remove:
-                            names.remove(name)
-                for member in members_to_move:
-                    await client.move_member(member, channel) #use asyncio.gather(*members_to_move) instead for concurrency?
-        player.start()
-        
-#working fine, removed to develop new reaction-mass-move
+#OUTDATED
 async def on_reaction_add(reaction, user):
     # code to clear messages by emjois
-    # note to JT: Available messages in bot's cache only persist until bot restart. Furthermore, if a message is sent while the bot is offline, the bot cannot access that message.
+    # note to JT: Available messages in bot's cache only persist until bot restart. Furthermore, if a message is sent while the bot is offline, the bot cannot access that message unless use history.
     
     if(user.server_permissions.manage_messages):
         channel = reaction.message.channel

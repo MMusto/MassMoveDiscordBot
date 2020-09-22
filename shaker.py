@@ -13,7 +13,6 @@ class Shaker(commands.Cog):
         self.active = False
         self.victims = set()
         self.speed = 0.5
-        self.lock = asyncio.Lock()
         self.diseased = None
         self.first = True
 
