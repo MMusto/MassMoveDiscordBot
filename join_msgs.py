@@ -40,10 +40,25 @@ class JoinSound(commands.Cog):
             await ctx.send(f"{m.mention} is now the trigger!")
 
     @commands.command(name="clearjs", help="Clears custom message and trigger person")
-    async def _clear(self, ctx, name):
+    async def _clear(self, ctx):
         self.selected_member = None
         self.join_mp3 = None
         await ctx.send("JoinSound trigger and message successfully cleared!")
+
+    @commands.command(name="setjs", help="Clears custom message and trigger person")
+    async def _set_member_and_msg(self, ctx, name, *msg):
+        
+        m = self._get_member(ctx, name)
+        if m is None:
+            await ctx.send(f"'{name}' was not found!")
+        else:
+            msg = " ".join(msg)
+            ret = await self._set_msg(ctx, msg)
+            if ret:
+                self.selected_member = m
+                await ctx.send("JoinSound trigger and message successfully set!")
+            else:
+                await ctx.send("Invalid Message!")
 
     async def _set_msg(self, ctx, msg):
         if len(msg) > 0:
@@ -51,16 +66,19 @@ class JoinSound(commands.Cog):
             tts = gTTS(msg)
             tts.save(mp3_name)
             self.join_mp3 = mp3_name
-            await ctx.send("SUCCESS!", delete_after=3)
-        else:
-            await ctx.send("INVALID MESSAGE!", delete_after=3)
+            return True
+        return False
 
     @commands.command(name = "setmsg")
     async def _set_single_message(self, ctx, *msg):
         """Set custom join message (TTS)
         """
         msg = " ".join(msg)
-        await self._set_msg(ctx, msg)
+        ret = await self._set_msg(ctx, msg)
+        if ret:
+            await ctx.send("SUCCESS!", delete_after=3)
+        else:
+            await ctx.send("INVALID MESSAGE!", delete_after=3)
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
