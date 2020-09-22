@@ -1,7 +1,6 @@
 from os import environ
 import discord
 from discord.ext import commands
-from helper import permission_to_move, get_channel, get_role, error, mbr_helper
 import asyncio
 from search import Search
 from among_us_code import AmongUs
@@ -30,6 +29,42 @@ async def on_ready():
     print(f"[!] {client.user.name} initializing...")
     await start_mass_move_reactions()
     print(f"[!] {client.user.name} initialization complete!")
+
+######################################## HELPER FUNCTIONS ############################################
+######################################## HELPER FUNCTIONS ############################################    
+def error(msg):
+    print("Error: " + msg)
+    
+def get_channel(server, chname : str) -> "Channel":
+    '''Helper function that returns Channel object from name snippet'''
+    for channel in server.channels:
+        if(str(channel.type) == 'voice'):
+                if(chname.lower() in channel.name.lower()):
+                        return channel
+    return None
+    
+async def mbr_helper(server, role : str, ch1, ch2) -> "None":
+    '''Based off mbr. Integrated for use in .mcc'''
+    got_role = get_role(server, role)
+
+    all_members = ch1.members
+    for member in all_members:
+        for rolee in member.roles:
+            if rolee == got_role:
+                await member.move_to(ch2)
+
+def get_role(server, role_name : str) -> 'Role':
+    '''Helper function that returns Role object from name snippet'''
+    for role in server.roles:
+        if role_name.lower() in role.name.lower():
+            return role
+    return None
+
+def permission_to_move(user):
+	return user.guild_permissions.move_members
+                    
+######################################## END OF HELPER FUNCTIONS ############################################
+######################################## END OF HELPER FUNCTIONS ############################################
 
 async def start_mass_move_reactions():
     '''Init mass move'''
