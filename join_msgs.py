@@ -87,12 +87,15 @@ class JoinSound(commands.Cog):
                             before and before.channel is after.channel,
                             after.afk,
                             self.selected_member is None,
-                            after.channel is None, # first condition might account for this
-                            not self._check_perms(after.channel.guild.me.permissions_in(after.channel))
+                            after.channel is None # first condition might account for this
                           )
 
         if any(quit_conditions):
             return
+        
+        perms = after.channel.guild.me.permissions_in(after.channel)
+        if not self._check_perms(perms):
+            return 
 
         channel = after.channel
         server = channel.guild
