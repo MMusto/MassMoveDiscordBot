@@ -143,7 +143,7 @@ async def mbr(ctx, role_name: str, chname: str) -> None:
         all_members = server.members
 
         if(ch is None and got_role is None):
-            await ctx.send(f"Sorry, both '{chname}' and '{role}' could not be found.")
+            await ctx.send(f"Sorry, both '{chname}' and '{role_name}' could not be found.")
         elif(ch is None):
             await ctx.send(f"Sorry, '{chname}' could not be found.")
         elif(got_role is None):
