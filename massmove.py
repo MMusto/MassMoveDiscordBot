@@ -2,8 +2,8 @@ import discord
 from discord.ext import commands
 import asyncio
 
-EMOJI = '🟢'
 CONTROL_PANEL_ID = 635919393179828226
+EMOJI = '🟢'
 
 def perms_to_move():
     async def predicate(ctx):
@@ -89,6 +89,9 @@ class MassMove(commands.Cog):
     @commands.command(pass_context=True)
     @perms_to_move()
     async def resetmm(self, ctx):
+        '''If you make any Discord changes while the bot is running (such as adding or moving around channels), 
+            simply use this command to reload the control panel.
+        '''
         await self.init_control_panel()
 
     @commands.command(pass_context=True)
