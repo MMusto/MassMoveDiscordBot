@@ -1,0 +1,195 @@
+import discord
+from discord.ext import commands
+import asyncio
+
+EMOJI = '🟢'
+CONTROL_PANEL_ID = 635919393179828226
+
+def perms_to_move():
+    async def predicate(ctx):
+        if ctx.author.guild_permissions.move_members:
+            return True
+        else:
+            await ctx.send(f"Sorry you don't have permissions for that, {ctx.author.mention}")
+    return commands.check(predicate)
+
+class MassMove(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        self.control_panel = None
+        self.message_to_channel = {}
+                    
+    @commands.Cog.listener()
+    async def on_ready(self):
+        print(f"[!] MassMove initializing...")
+        await self.init_control_panel()
+        print(f"[!] MassMove initialization complete!")
+
+    ######################################## HELPER FUNCTIONS ############################################
+
+    # TODO: Switch to built-in logger if when expanding functionality
+    def error(self, msg):
+        print(f"[!] Error: {msg}")
+    
+    def _any_null(self, *args):
+        for a in args:
+            if a is None:
+                return True
+        return False
+        
+    def _get_channel(self, server, chname : str) -> discord.channel.VoiceChannel:
+        '''Helper function that returns Channel object from name snippet'''
+        for channel in server.channels:
+            if type(channel) is discord.channel.VoiceChannel and chname.lower() in channel.name.lower():
+                return channel
+        return None
+        
+    async def _mbr_helper(self, server, role_name : str, src_channel, dst_channel) -> None:
+        '''Based off mbr. Integrated for use in .mcc
+            Moves all members from src to dst if member has role_name in role.name
+        ''' 
+        role = self._get_role(server, role_name)
+        if role:
+            all_members = src_channel.members
+            for member in all_members:
+                if role in member.roles:
+                    await member.move_to(dst_channel)
+
+    def _get_role(self, server, role_name : str) -> discord.Role:
+        '''Helper function that returns Role object from name snippet'''
+        for role in server.roles:
+            if role_name.lower() in role.name.lower():
+                return role
+        return None
+    ######################################## END OF HELPER FUNCTIONS ############################################
+
+    async def init_control_panel(self) -> None:
+        '''Init mass move'''
+
+        self.control_panel = self.bot.get_channel(CONTROL_PANEL_ID)
+        if not self.control_panel:
+            self.error(f"Control Panel not found : {CONTROL_PANEL_ID}")
+            return
+
+        voice_channels = {}
+        channels =  self.control_panel.guild.channels
+        for channel in channels:
+            if type(channel) is discord.channel.VoiceChannel:
+                voice_channels[channel.name] = channel
+
+        await self.control_panel.purge(limit=None)
+
+        for channel in sorted(voice_channels.keys(), key = lambda channel_name: voice_channels[channel_name].position):
+            name = "**"+channel+"**"
+            message = await self.control_panel.send(embed = discord.Embed(title = name))
+            await message.add_reaction(EMOJI)
+            # await message.add_reaction(DST_EMOJI)
+            self.message_to_channel[message.id] = voice_channels[channel].id
+
+    @commands.command(pass_context=True)
+    @perms_to_move()
+    async def resetmm(self, ctx):
+        await self.init_control_panel()
+
+    @commands.command(pass_context=True)
+    @perms_to_move()
+    async def mg(self, ctx, game, chname):
+        ''' "Move game": Moves everyone playing "game" to channel with chname in channel name '''
+        server = ctx.guild
+        all_members = server.members
+
+        move_channel = self._get_channel(server, chname)
+        #Moves all people to specified channel if they have game in their currently playing game
+        for member in all_members:
+            if(member.voice != None and member.voice.channel and not member.voice.afk and game.lower() in str(member.game).lower()):
+                await member.move_to(move_channel)
+        await ctx.send(f"Mass moved everyone playing {game} to {str(move_channel)}")
+
+    @commands.command(pass_context=True)
+    @perms_to_move()
+    async def mah(self, ctx):
+        ''' "Move-All-Here" : Moves everyone to your current voice channel '''
+        server = ctx.guild
+        author = ctx.author
+        all_members = server.members
+
+        if author.voice:
+            move_channel = author.voice.channel
+        else:
+            await ctx.send(f"You have to be in a Voice Channel to use this command, {ctx.author.mention}")
+            return
+        #Moves all people to author's channel
+        for member in all_members:
+            if(member.voice and not member.voice.afk and member != author):
+                await member.move_to(move_channel)
+        await ctx.send(f"Mass moved everyone to {str(move_channel)}")
+        await ctx.message.delete()
+            
+    @commands.command(pass_context=True)
+    async def mcc(self, ctx, src_name : str, dst_name : str, *role_names):
+        ''' "Move-Channel-to-Channel" : .mcc (SRC CHANNEL) (DEST CHANNEL) [ROLES TO MOVE] -  Moves everyone from SRC to DEST. If roles are included, only users with the specified roles will be moved '''
+        server = ctx.message.guild
+        src_channel = self._get_channel(server, src_name)
+        dst_channel = self._get_channel(server, dst_name)
+        
+        if len(role_names) == 0:
+            if self._any_null(src_channel, dst_channel):
+                null_names = [name for obj, name in [(src_channel, src_name), (dst_channel, dst_name)] if obj is None]
+                await ctx.send(f"Sorry, {' and '.join(null_names)} could not be found.")
+                return
+            lst = [member.move_to(dst_channel) for member in src_channel.members]
+            await asyncio.gather(*lst)
+        else:
+            for role_name in role_names:
+                await self._mbr_helper(server, role_name, src_channel, dst_channel)
+        
+    @commands.command(pass_context=True)
+    async def mbr(self, ctx, role_name: str, dst_name: str):
+        ''' "Move-By-Role" : .mbr (ROLE_NAME) (DEST CHANNEL) -  Moves everyone with ROLE_NAME to DEST CHANNEL '''
+        server = ctx.message.guild
+        dst_channel = self._get_channel(server, dst_name)
+        got_role = self._get_role(server, role_name)
+        all_members = server.members
+
+        
+        if self._any_null(dst_channel, got_role):
+            null_names = [name for obj, name in [(dst_channel, dst_name), (got_role, role_name)] if obj is None]
+            await ctx.send(f"Sorry, {' and '.join(null_names)} could not be found.")
+            return
+
+        for member in all_members:
+            if(member.voice is not None and member.voice.channel != dst_channel and not member.voice.afk):
+                for role in member.roles:
+                    if role == got_role:
+                        await member.move_to(dst_channel)
+
+    def reaction_add_check(self, reaction, user):
+        requirements = \
+        (
+            user != self.bot.user,
+            reaction.emoji == EMOJI,
+            reaction.message.guild.get_member(user.id).guild_permissions.move_members,
+            reaction.message.channel == self.control_panel,
+            reaction.message.id in self.message_to_channel
+        )
+        return all(requirements)
+
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        if self.reaction_add_check(reaction, user):
+            def check(r,u):
+                return r.emoji == EMOJI and u == user and r.message.id in self.message_to_channel
+
+            try:
+                next_reaction, _ = await self.bot.wait_for('reaction_add', check = check, timeout = 3)
+                dst_channel = self.bot.get_channel(self.message_to_channel[next_reaction.message.id])
+            except asyncio.TimeoutError:
+                await reaction.message.remove_reaction(EMOJI, user)
+                return
+
+            src_channel = self.bot.get_channel(self.message_to_channel[reaction.message.id])
+            members_to_move = [member.move_to(dst_channel) for member in src_channel.members]
+            await asyncio.gather(*members_to_move)
+            await reaction.message.remove_reaction(EMOJI, user)
+            await next_reaction.message.remove_reaction(EMOJI, user)
+            print(f"{user.display_name}/{user.name} moved everyone from {src_channel.name} to {dst_channel.name}")
