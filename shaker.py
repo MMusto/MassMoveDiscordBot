@@ -15,6 +15,7 @@ class Shaker(commands.Cog):
         self.speed = 0.5
         self.diseased = None
         self.first = True
+        self.caller_channel = None
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -80,6 +81,7 @@ class Shaker(commands.Cog):
         # Might need mutex lock here?
         if not self.active:
             self.shaker_loop.start()
+            self.caller_channel = ctx.author.voice.channel if ctx.author.voice else None
             await ctx.send(f"Shaking victims: {', '.join([u.mention for u in self.victims])}")
         else:
             self.shaker_loop.cancel()
@@ -90,7 +92,7 @@ class Shaker(commands.Cog):
     async def _shake(self, victim):
         if victim.voice:
             curr_channel = victim.voice.channel
-            all_choices = [channel for channel in curr_channel.guild.voice_channels if channel != curr_channel]
+            all_choices = [channel for channel in curr_channel.guild.voice_channels if channel != curr_channel and channel != self.caller_channel]
             await victim.move_to(all_choices[randint(0, len(all_choices) - 1)])
 
     @tasks.loop(seconds=1.0)
