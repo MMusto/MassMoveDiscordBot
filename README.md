@@ -5,7 +5,7 @@ This bot can be run from your own computer or a dedicated host such as Heroku (T
 
 Requirements are as follows:
 1. Discord.py API wrapper found here: [Link](https://github.com/Rapptz/discord.py)
-2. Python 3.7.3+ (https://www.python.org/downloads/release/python-373/)
+2. [Python 3.7.3+](https://www.python.org/downloads/release/python-373/)
 3. A Discord app. (You can create one [here](https://discordapp.com/developers/applications/))
 
 ## Setup
