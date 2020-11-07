@@ -13,7 +13,10 @@ from massmove import MassMove
 # Token is stored in Heroku environment to avoid
 # the vulnerability of private Discord bot key exposed to public
 TOKEN = environ["TOKEN"]
-client = commands.Bot(command_prefix = '.')
+intents = discord.Intents.default()
+intents.members = True
+intents.reactions = True
+client = commands.Bot(command_prefix = '.', intents = intents)
 client.add_cog(AmongUs(client))
 client.add_cog(Shaker(client))
 client.add_cog(JoinSound(client))
