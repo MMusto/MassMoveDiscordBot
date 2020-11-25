@@ -8,6 +8,7 @@ def shaker_check():
     return commands.check(predicate)
 
 class Shaker(commands.Cog):
+    # Shaker is limited by the ratelimited API calls
     def __init__(self, bot):
         self.bot = bot
         self.active = False
