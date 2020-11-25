@@ -25,6 +25,17 @@ class MassMove(commands.Cog):
         await self.init_control_panel()
         print(f"[!] MassMove initialization complete!")
 
+    @commands.Cog.listener()
+    async def on_guild_channel_update(before, after):
+        if before.id in self.message_to_channel.values() and before.name != after.name:
+            if control_panel:
+                for mid,cid in self.message_to_channel.items():
+                    if before.id = cid:
+                    msg = await self.control_panel.fetch(mid)
+                    await msg.edit(f'**{after.name}**')
+            else:
+                self.error('Unknown error in "on_guild_channel_update"')
+
     ######################################## HELPER FUNCTIONS ############################################
 
     # TODO: Switch to built-in logger if when expanding functionality
@@ -81,7 +92,7 @@ class MassMove(commands.Cog):
             await message.add_reaction(EMOJI)
             self.message_to_channel[message.id] = channel.id
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @perms_to_move()
     async def resetmm(self, ctx):
         '''If you make any Discord changes while the bot is running (such as adding or moving around channels), 
@@ -89,7 +100,7 @@ class MassMove(commands.Cog):
         '''
         await self.init_control_panel()
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @perms_to_move()
     async def mg(self, ctx, game, chname):
         ''' "Move game": Moves everyone playing "game" to channel with chname in channel name '''
@@ -103,7 +114,7 @@ class MassMove(commands.Cog):
                 await member.move_to(move_channel)
         await ctx.send(f"Mass moved everyone playing {game} to {str(move_channel)}")
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @perms_to_move()
     async def mah(self, ctx):
         ''' "Move-All-Here" : Moves everyone to your current voice channel '''
@@ -123,7 +134,7 @@ class MassMove(commands.Cog):
         await ctx.send(f"Mass moved everyone to {str(move_channel)}")
         await ctx.message.delete()
             
-    @commands.command(pass_context=True)
+    @commands.command()
     async def mcc(self, ctx, src_name : str, dst_name : str, *role_names):
         ''' "Move-Channel-to-Channel" : .mcc (SRC CHANNEL) (DEST CHANNEL) [ROLES TO MOVE] -  Moves everyone from SRC to DEST. If roles are included, only users with the specified roles will be moved '''
         server = ctx.message.guild
@@ -141,7 +152,7 @@ class MassMove(commands.Cog):
             for role_name in role_names:
                 await self._mbr_helper(server, role_name, src_channel, dst_channel)
         
-    @commands.command(pass_context=True)
+    @commands.command()
     async def mbr(self, ctx, role_name: str, dst_name: str):
         ''' "Move-By-Role" : .mbr (ROLE_NAME) (DEST CHANNEL) -  Moves everyone with ROLE_NAME to DEST CHANNEL '''
         server = ctx.message.guild
