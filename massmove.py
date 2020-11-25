@@ -28,11 +28,14 @@ class MassMove(commands.Cog):
     @commands.Cog.listener()
     async def on_guild_channel_update(self, before, after):
         if before.id in self.message_to_channel.values() and before.name != after.name:
-            if control_panel:
+            if self.control_panel:
                 for mid,cid in self.message_to_channel.items():
                     if before.id == cid:
-                        msg = await self.control_panel.fetch(mid)
-                        await msg.edit(f'**{after.name}**')
+                        msg = await self.control_panel.fetch_message(mid)
+                        if msg:
+                            await msg.edit(f'**{after.name}**')
+                        else:
+                            self.error('Control panel message not found!')
                         return
             else:
                 self.error('Unknown error in "on_guild_channel_update"')
