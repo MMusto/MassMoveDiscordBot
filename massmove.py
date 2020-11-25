@@ -71,20 +71,15 @@ class MassMove(commands.Cog):
             self.error(f"Control Panel not found : {CONTROL_PANEL_ID}")
             return
 
-        voice_channels = {}
-        channels =  self.control_panel.guild.channels
-        for channel in channels:
-            if type(channel) is discord.channel.VoiceChannel:
-                voice_channels[channel.name] = channel
+        channels =  [ch for ch in self.control_panel.guild.channels if isinstance(ch, discord.channel.VoiceChannel)]
 
         await self.control_panel.purge(limit=None)
 
-        for channel in sorted(voice_channels.keys(), key = lambda channel_name: voice_channels[channel_name].position):
-            name = "**"+channel+"**"
+        for channel in sorted(channels, key = lambda ch: ch.position):
+            name = "**"+channel.name+"**"
             message = await self.control_panel.send(embed = discord.Embed(title = name))
             await message.add_reaction(EMOJI)
-            # await message.add_reaction(DST_EMOJI)
-            self.message_to_channel[message.id] = voice_channels[channel].id
+            self.message_to_channel[message.id] = channel.id
 
     @commands.command(pass_context=True)
     @perms_to_move()
