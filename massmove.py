@@ -30,9 +30,10 @@ class MassMove(commands.Cog):
         if before.id in self.message_to_channel.values() and before.name != after.name:
             if control_panel:
                 for mid,cid in self.message_to_channel.items():
-                    if before.id = cid:
-                    msg = await self.control_panel.fetch(mid)
-                    await msg.edit(f'**{after.name}**')
+                    if before.id == cid:
+                        msg = await self.control_panel.fetch(mid)
+                        await msg.edit(f'**{after.name}**')
+                        return
             else:
                 self.error('Unknown error in "on_guild_channel_update"')
 
