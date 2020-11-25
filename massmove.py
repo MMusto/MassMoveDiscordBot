@@ -27,6 +27,7 @@ class MassMove(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_channel_update(self, before, after):
+        # TODO: Update control panel when channels are created, deleted, and moved
         if before.id in self.message_to_channel.values() and before.name != after.name:
             if self.control_panel:
                 for mid,cid in self.message_to_channel.items():
