@@ -17,6 +17,7 @@ print(discord.__version__)
 intents = discord.Intents.default()
 intents.members = True
 intents.reactions = True
+intents.guilds = True
 client = commands.Bot(command_prefix = '.', intents = intents)
 client.add_cog(AmongUs(client))
 client.add_cog(Shaker(client))
