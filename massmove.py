@@ -26,7 +26,7 @@ class MassMove(commands.Cog):
         print(f"[!] MassMove initialization complete!")
 
     @commands.Cog.listener()
-    async def on_guild_channel_update(before, after):
+    async def on_guild_channel_update(self, before, after):
         if before.id in self.message_to_channel.values() and before.name != after.name:
             if control_panel:
                 for mid,cid in self.message_to_channel.items():
