@@ -33,7 +33,7 @@ class MassMove(commands.Cog):
                     if before.id == cid:
                         msg = await self.control_panel.fetch_message(mid)
                         if msg:
-                            await msg.edit(content = f'**{after.name}**')
+                            await msg.edit(embed = discord.Embed(title = f'**{after.name}**'))
                         else:
                             self.error('Control panel message not found!')
                         return
