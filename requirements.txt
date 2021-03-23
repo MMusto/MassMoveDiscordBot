@@ -1,7 +1,7 @@
 git+https://github.com/Rapptz/discord.py#egg=discord.py
 asyncio
 PyNaCl
-aiohttp>=3.6.0,<3.7.0
+aiohttp>=3.7.4
 pandas
 xlrd
 gTTS
