@@ -30,6 +30,33 @@ class JoinSound(commands.Cog):
                     break
         return result
 
+    @commands.command(name="botsay", help="Have the bot join your voice channel and say custom TTS message") 
+    async def _botsay(self, ctx, *msg):
+        channel = ctx.author.voice.channel
+        if not channel:
+            ctx.say("{ctx.author.mention}, you must be in a voice channel to use this command!")
+            return
+
+        msg = " ".join(msg)
+
+        mp3_name = 'botsay_custom_msg.mp3'
+        tts = gTTS(msg)
+        tts.save(mp3_name)
+        
+        server = channel.guild
+        def dc_bot(error):
+            try:
+                fut = asyncio.run_coroutine_threadsafe(server.voice_client.disconnect(), self.bot.loop)
+                fut.result()
+            except Exception as e:
+                print(e)
+
+        if server.voice_client == None:
+            await channel.connect()
+            audio_source = discord.FFmpegPCMAudio(mp3_name)
+            server.voice_client.play(audio_source, after=dc_bot)
+
+
     @commands.command(name="setperson", help="Sets person to attach join message to.")
     async def _set_selected_member(self, ctx, name):
         m = self._get_member(ctx, name)
