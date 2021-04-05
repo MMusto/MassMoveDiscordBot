@@ -31,7 +31,7 @@ class JoinSound(commands.Cog):
                     break
         return result
 
-    @commands.command(name"block", hidden = True)
+    @commands.command(name="block", hidden=True)
     async def _botsay_ban(self, ctx, name):
         if ctx.author.id == 140976154512326656:
             self.bans.append(self._get_member(ctx, name))
