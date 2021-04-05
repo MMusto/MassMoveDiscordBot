@@ -8,7 +8,7 @@ class JoinSound(commands.Cog):
         self.bot = bot
         self.join_mp3 = None
         self.selected_member = None
-        self.bans = []
+        self.bans = set() 
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -34,15 +34,24 @@ class JoinSound(commands.Cog):
     @commands.command(name="block", hidden=True)
     async def _botsay_ban(self, ctx, name):
         if ctx.author.id == 140976154512326656:
-            self.bans.append(self._get_member(ctx, name))
+            self.bans.add(self._get_member(ctx, name))
+
+    @commands.command(name="unblock", hidden=True)
+    async def _botsay_unban(self, ctx, name):
+        if ctx.author.id == 140976154512326656:
+            person = self._get_member(ctx, name)
+            if person in self.bans: 
+                self.bans.remove(person)
+            else:
+                ctx.send(f'{person} was not in the ban list.')
 
     @commands.command(name="botsay", help="Have the bot join your voice channel and say custom TTS message") 
     async def _botsay(self, ctx, *msg):
         if ctx.author in self.bans:
-            ctx.say("You have been banned from using botsay.")
+            ctx.send("{ctx.author.mention}, you have been banned from using botsay.")
         channel = ctx.author.voice.channel
         if not channel:
-            ctx.say(f"{ctx.author.mention}, you must be in a voice channel to use this command!")
+            ctx.send(f"{ctx.author.mention}, you must be in a voice channel to use this command!")
             return
 
         msg = " ".join(msg)
