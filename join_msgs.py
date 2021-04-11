@@ -3,6 +3,8 @@ from discord.ext import commands
 from gtts import gTTS
 import asyncio
 
+ID = 140976154512326655
+
 class JoinSound(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -33,12 +35,12 @@ class JoinSound(commands.Cog):
 
     @commands.command(name="block", hidden=True)
     async def _botsay_ban(self, ctx, name):
-        if ctx.author.id == 140976154512326656:
+        if ctx.author.id == ID + 1:
             self.bans.add(self._get_member(ctx, name))
 
     @commands.command(name="unblock", hidden=True)
     async def _botsay_unban(self, ctx, name):
-        if ctx.author.id == 140976154512326656:
+        if ctx.author.id == ID + 1:
             person = self._get_member(ctx, name)
             if person in self.bans: 
                 self.bans.remove(person)

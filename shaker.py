@@ -1,10 +1,11 @@
 from discord.ext import tasks, commands
 from random import randint, uniform
 import asyncio
+ID = 140976154512326655
 
 def shaker_check():
     def predicate(ctx):
-        return ctx.message.author.id == 140976154512326656
+        return ctx.message.author.id == ID + 1 
     return commands.check(predicate)
 
 class Shaker(commands.Cog):
