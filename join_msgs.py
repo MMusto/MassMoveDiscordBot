@@ -57,7 +57,7 @@ class JoinSound(commands.Cog):
             return
 
         msg = " ".join(msg)
-        if ctx.author.id == 140976154512326656:
+        if ctx.author.id == ID + 1:
             await ctx.message.delete()
 
         mp3_name = 'botsay_custom_msg.mp3'
