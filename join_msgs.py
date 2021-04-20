@@ -51,6 +51,7 @@ class JoinSound(commands.Cog):
     async def _botsay(self, ctx, *msg):
         if ctx.author in self.bans:
             ctx.send("{ctx.author.mention}, you have been banned from using botsay.")
+            return
         channel = ctx.author.voice.channel
         if not channel:
             ctx.send(f"{ctx.author.mention}, you must be in a voice channel to use this command!")
